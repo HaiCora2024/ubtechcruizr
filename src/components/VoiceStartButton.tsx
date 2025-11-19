@@ -47,7 +47,10 @@ export const VoiceStartButton = ({ onSend, isLoading, lastMessage }: VoiceStartB
       {/* Cat Eyes */}
       <div className="flex gap-16 items-center justify-center mb-4">
         <div className="relative">
-          <div className="w-20 h-20 bg-foreground rounded-full flex items-center justify-center">
+          <div className={cn(
+            "w-20 h-20 bg-foreground rounded-full flex items-center justify-center",
+            !isRecording && "animate-blink"
+          )}>
             <div className={cn(
               "w-10 h-10 bg-background rounded-full transition-all duration-300",
               isRecording && "animate-pulse"
@@ -55,7 +58,10 @@ export const VoiceStartButton = ({ onSend, isLoading, lastMessage }: VoiceStartB
           </div>
         </div>
         <div className="relative">
-          <div className="w-20 h-20 bg-foreground rounded-full flex items-center justify-center">
+          <div className={cn(
+            "w-20 h-20 bg-foreground rounded-full flex items-center justify-center",
+            !isRecording && "animate-blink"
+          )}>
             <div className={cn(
               "w-10 h-10 bg-background rounded-full transition-all duration-300",
               isRecording && "animate-pulse"
