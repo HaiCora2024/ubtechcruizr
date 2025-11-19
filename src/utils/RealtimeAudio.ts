@@ -64,7 +64,7 @@ export class RealtimeChat {
   private pc: RTCPeerConnection | null = null;
   private dc: RTCDataChannel | null = null;
   private audioEl: HTMLAudioElement;
-  private recorder: AudioRecorder | null = null;
+  private audioTrack: MediaStreamTrack | null = null;
 
   constructor(
     private onMessage: (message: any) => void,
@@ -102,7 +102,7 @@ export class RealtimeChat {
         this.audioEl.srcObject = e.streams[0];
       };
 
-      // Add local audio track
+      // Get microphone but keep it muted initially
       const ms = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           sampleRate: 24000,
@@ -112,8 +112,11 @@ export class RealtimeChat {
           autoGainControl: true
         }
       });
-      this.pc.addTrack(ms.getTracks()[0]);
-      console.log('Added local audio track');
+      
+      this.audioTrack = ms.getTracks()[0];
+      this.audioTrack.enabled = false; // Start muted
+      this.pc.addTrack(this.audioTrack);
+      console.log('Added local audio track (muted)');
 
       // Set up data channel
       this.dc = this.pc.createDataChannel("oai-events");
@@ -175,9 +178,26 @@ export class RealtimeChat {
     }
   }
 
+  enableMicrophone() {
+    if (this.audioTrack) {
+      this.audioTrack.enabled = true;
+      console.log('Microphone enabled');
+    }
+  }
+
+  disableMicrophone() {
+    if (this.audioTrack) {
+      this.audioTrack.enabled = false;
+      console.log('Microphone disabled');
+    }
+  }
+
   disconnect() {
     console.log('Disconnecting...');
-    this.recorder?.stop();
+    if (this.audioTrack) {
+      this.audioTrack.stop();
+      this.audioTrack = null;
+    }
     this.dc?.close();
     this.pc?.close();
     this.audioEl.srcObject = null;
