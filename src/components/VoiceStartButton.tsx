@@ -93,15 +93,15 @@ export const VoiceStartButton = ({ onSend, isLoading, lastMessage }: VoiceStartB
             "relative z-10 h-[280px] w-[280px] transition-all shadow-2xl flex flex-col gap-6",
             isRecording
               ? "bg-destructive hover:bg-destructive/90 rounded-[50%]"
-              : "bg-gradient-to-br from-primary to-spa hover:opacity-90 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]"
+              : "bg-gradient-to-br from-zinc-700 via-zinc-600 to-pink-400 hover:opacity-90 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]"
           )}
         >
           {isProcessing || isLoading ? (
-            <Loader2 className="w-24 h-24 animate-spin" />
+            <Loader2 className="w-24 h-24 animate-spin text-white" />
           ) : (
             <>
-              <Mic className="w-24 h-24" />
-              <span className="text-2xl font-semibold">
+              <Mic className="w-24 h-24 text-white" />
+              <span className="text-2xl font-semibold text-white">
                 {isRecording ? "Tap to Stop" : "TAP HERE"}
               </span>
             </>
