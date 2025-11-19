@@ -80,12 +80,9 @@ export const VoiceStartButton = ({ onSend, isLoading, lastMessage }: VoiceStartB
           className={cn(
             "relative z-10 h-[280px] w-[280px] transition-all shadow-2xl flex flex-col gap-6",
             isRecording
-              ? "bg-destructive hover:bg-destructive/90 rounded-full"
-              : "bg-gradient-to-br from-primary to-spa hover:opacity-90 rounded-[50%_50%_45%_45%]"
+              ? "bg-destructive hover:bg-destructive/90 rounded-[50%]"
+              : "bg-gradient-to-br from-primary to-spa hover:opacity-90 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]"
           )}
-          style={{
-            clipPath: isRecording ? 'none' : 'polygon(50% 0%, 100% 100%, 0% 100%)'
-          }}
         >
           {isProcessing || isLoading ? (
             <Loader2 className="w-24 h-24 animate-spin" />
