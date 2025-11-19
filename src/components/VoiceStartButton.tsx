@@ -36,7 +36,7 @@ export const VoiceStartButton = ({ onSend, isLoading, lastMessage }: VoiceStartB
   return (
     <div className="flex flex-col items-center justify-center h-full gap-8 p-8">
       <div className="text-center space-y-4">
-        <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-spa bg-clip-text text-transparent">
+        <h1 className="text-5xl font-bold text-cyan-500">
           Hotel Panorama & Spa
         </h1>
         <p className="text-xl text-muted-foreground">
