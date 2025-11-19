@@ -32,18 +32,18 @@ export const VoiceButton = ({
       onClick={handleClick}
       disabled={disabled || isProcessing}
       className={cn(
-        "h-[60px] w-[60px] rounded-xl transition-all",
+        "h-[100px] w-[100px] rounded-2xl transition-all shadow-lg",
         isRecording
           ? "bg-destructive hover:bg-destructive/90 animate-pulse"
           : "bg-accent hover:bg-accent/90"
       )}
     >
       {isProcessing ? (
-        <Loader2 className="w-5 h-5 animate-spin" />
+        <Loader2 className="w-10 h-10 animate-spin" />
       ) : isRecording ? (
-        <MicOff className="w-5 h-5" />
+        <MicOff className="w-10 h-10" />
       ) : (
-        <Mic className="w-5 h-5" />
+        <Mic className="w-10 h-10" />
       )}
     </Button>
   );

@@ -48,8 +48,8 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
         onKeyDown={handleKeyDown}
         placeholder="Zadaj pytanie o hotel... (lub użyj mikrofonu)"
         disabled={disabled || isRecording || isProcessing}
-        className="min-h-[60px] resize-none"
-        rows={2}
+        className="min-h-[100px] resize-none text-lg"
+        rows={3}
       />
       <VoiceButton
         isRecording={isRecording}
@@ -62,12 +62,12 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
         type="submit" 
         size="icon"
         disabled={!message.trim() || disabled || isRecording || isProcessing}
-        className="h-[60px] w-[60px] rounded-xl bg-gradient-to-br from-primary to-spa hover:opacity-90 transition-opacity"
+        className="h-[100px] w-[100px] rounded-2xl bg-gradient-to-br from-primary to-spa hover:opacity-90 transition-opacity shadow-lg"
       >
         {disabled ? (
-          <Loader2 className="w-5 h-5 animate-spin" />
+          <Loader2 className="w-10 h-10 animate-spin" />
         ) : (
-          <Send className="w-5 h-5" />
+          <Send className="w-10 h-10" />
         )}
       </Button>
     </form>
