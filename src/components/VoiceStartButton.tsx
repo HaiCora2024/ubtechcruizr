@@ -86,6 +86,11 @@ export const VoiceStartButton = ({ onSend, isLoading, lastMessage }: VoiceStartB
           </>
         )}
         
+        {/* Shadow under nose */}
+        {!isRecording && (
+          <div className="absolute top-[240px] left-1/2 -translate-x-1/2 w-[200px] h-[60px] bg-foreground/10 rounded-[50%] blur-xl" />
+        )}
+        
         <Button
           onClick={handleClick}
           disabled={isProcessing || isLoading}
