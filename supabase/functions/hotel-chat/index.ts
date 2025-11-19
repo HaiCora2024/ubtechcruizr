@@ -30,7 +30,7 @@ serve(async (req) => {
       .map((item: any) => `Q: ${item.q}\nA: ${item.a}`)
       .join('\n\n');
     
-    const systemPrompt = `${hotelData.context}\n\nFAQ:\n${faqText}`;
+    const systemPrompt = `${hotelData.context}\n\nFAQ:\n${faqText}\n\nIMPORTANT: Always respond in the same language as the user's message. Detect the language of the user's question and answer in that exact language.`;
 
     console.log('Sending request to AI with message:', message);
 
