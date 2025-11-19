@@ -72,7 +72,7 @@ serve(async (req) => {
       .map((item: any) => `Q: ${item.q}\nA: ${item.a}`)
       .join('\n\n');
     
-    const instructions = `${hotelData.context}\n\nFAQ:\n${faqText}\n\nIMPORTANT: Always respond in the same language as the user speaks. Detect the language and answer in that exact language. Be helpful, friendly, and concise.`;
+    const instructions = `${hotelData.context}\n\nFAQ:\n${faqText}\n\nIMPORTANT: Always respond in the same language as the user speaks. Detect the language and answer in that exact language. Be EXTREMELY concise and brief - answer in 1-2 short sentences maximum. Get straight to the point without unnecessary words or explanations.`;
 
     console.log('Creating ephemeral token for Realtime API');
 
