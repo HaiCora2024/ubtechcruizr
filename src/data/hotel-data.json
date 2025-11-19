@@ -1,0 +1,54 @@
+{
+  "context": "Jesteś wirtualnym concierge'em Hotelu Panorama & Spa w Zakopanem. Odpowiadaj profesjonalnie, przyjaźnie i konkretnie. Mów zawsze w języku, w którym użytkownik zadał pytanie. Jeśli nie wiesz — powiedz, że sprawdzisz u menedżera.",
+  "faq": [
+    {
+      "q": "Gdzie znajduje się hotel?",
+      "a": "📍 Adres: ul. Górska 15, 34-500 Zakopane, Polska. Link do mapy: https://maps.app.goo.gl/exampleHotel"
+    },
+    {
+      "q": "Jakie są godziny zameldowania i wymeldowania?",
+      "a": "🕒 Zameldowanie od 14:00, wymeldowanie do 11:00."
+    },
+    {
+      "q": "Czy w hotelu jest spa?",
+      "a": "💆‍♀️ Tak, strefa SPA jest czynna codziennie od 10:00 do 21:00. Goście hotelowi mają 10% zniżki na masaże."
+    },
+    {
+      "q": "Czy można przyjechać z dziećmi?",
+      "a": "👨‍👩‍👧‍👦 Tak, dzieci są mile widziane! Dla najmłodszych przygotowaliśmy kącik zabaw i menu dziecięce."
+    },
+    {
+      "q": "Czy hotel przyjmuje zwierzęta?",
+      "a": "🐾 Tak, przyjmujemy małe zwierzęta domowe za dodatkową opłatą 50 PLN za noc."
+    },
+    {
+      "q": "Czy można odwołać rezerwację?",
+      "a": "❗ Rezerwacje bezzwrotne nie podlegają zwrotowi. W przypadku rezerwacji elastycznych anulacja jest możliwa do 3 dni przed przyjazdem."
+    },
+    {
+      "q": "Jak dojechać do hotelu?",
+      "a": "🚗 Hotel znajduje się 2 km od centrum Zakopanego. Można do nas dojechać taksówką, autobusem lub zamówić transfer z dworca."
+    },
+    {
+      "q": "Czy jest dostępne Wi-Fi?",
+      "a": "📶 Tak, darmowe Wi-Fi jest dostępne w całym obiekcie."
+    },
+    {
+      "q": "Czy można płacić kartą?",
+      "a": "💳 Tak, akceptujemy wszystkie główne karty płatnicze, w tym Visa, Mastercard i Revolut."
+    },
+    {
+      "q": "Jakie atrakcje są w pobliżu?",
+      "a": "🎿 W pobliżu znajdują się Krupówki (15 min pieszo), kolejka na Gubałówkę i Termy Chochołowskie (30 min jazdy)."
+    },
+    {
+      "q": "Czy jest parking?",
+      "a": "🅿️ Tak, bezpłatny parking dla gości znajduje się tuż przy wejściu."
+    }
+  ],
+  "fallback": {
+    "pl": "To ciekawe pytanie. Pozwól, że skonsultuję się z menedżerem.",
+    "en": "That's an interesting question. Let me check with the manager.",
+    "ru": "Это интересный вопрос. Позвольте уточнить у менеджера."
+  }
+}
