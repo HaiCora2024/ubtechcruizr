@@ -43,7 +43,28 @@ export const VoiceStartButton = ({ onSend, isLoading, lastMessage }: VoiceStartB
           Wirtualny Asystent Recepcji
         </p>
       </div>
+
+      {/* Cat Eyes */}
+      <div className="flex gap-16 items-center justify-center mb-4">
+        <div className="relative">
+          <div className="w-20 h-20 bg-foreground rounded-full flex items-center justify-center">
+            <div className={cn(
+              "w-10 h-10 bg-background rounded-full transition-all duration-300",
+              isRecording && "animate-pulse"
+            )} />
+          </div>
+        </div>
+        <div className="relative">
+          <div className="w-20 h-20 bg-foreground rounded-full flex items-center justify-center">
+            <div className={cn(
+              "w-10 h-10 bg-background rounded-full transition-all duration-300",
+              isRecording && "animate-pulse"
+            )} />
+          </div>
+        </div>
+      </div>
       
+      {/* Cat Nose Button */}
       <div className="relative">
         {isRecording && (
           <>
@@ -57,11 +78,14 @@ export const VoiceStartButton = ({ onSend, isLoading, lastMessage }: VoiceStartB
           onClick={handleClick}
           disabled={isProcessing || isLoading}
           className={cn(
-            "relative z-10 h-[280px] w-[280px] rounded-3xl transition-all shadow-2xl flex flex-col gap-6",
+            "relative z-10 h-[280px] w-[280px] transition-all shadow-2xl flex flex-col gap-6",
             isRecording
-              ? "bg-destructive hover:bg-destructive/90"
-              : "bg-gradient-to-br from-primary to-spa hover:opacity-90"
+              ? "bg-destructive hover:bg-destructive/90 rounded-full"
+              : "bg-gradient-to-br from-primary to-spa hover:opacity-90 rounded-[50%_50%_45%_45%]"
           )}
+          style={{
+            clipPath: isRecording ? 'none' : 'polygon(50% 0%, 100% 100%, 0% 100%)'
+          }}
         >
           {isProcessing || isLoading ? (
             <Loader2 className="w-24 h-24 animate-spin" />
@@ -74,6 +98,16 @@ export const VoiceStartButton = ({ onSend, isLoading, lastMessage }: VoiceStartB
             </>
           )}
         </Button>
+        
+        {/* Cat Whiskers */}
+        {!isRecording && (
+          <>
+            <div className="absolute left-[-80px] top-1/2 w-16 h-1 bg-foreground/30 rounded-full" />
+            <div className="absolute left-[-70px] top-[45%] w-14 h-1 bg-foreground/30 rounded-full" />
+            <div className="absolute right-[-80px] top-1/2 w-16 h-1 bg-foreground/30 rounded-full" />
+            <div className="absolute right-[-70px] top-[45%] w-14 h-1 bg-foreground/30 rounded-full" />
+          </>
+        )}
       </div>
 
       {isRecording && (
