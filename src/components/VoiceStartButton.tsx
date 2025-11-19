@@ -44,6 +44,12 @@ export const VoiceStartButton = ({ onSend, isLoading, lastMessage }: VoiceStartB
         </p>
       </div>
 
+      {/* Cat Ears */}
+      <div className="flex gap-32 items-center justify-center mb-[-20px]">
+        <div className="w-0 h-0 border-l-[40px] border-l-transparent border-r-[40px] border-r-transparent border-b-[60px] border-b-foreground" />
+        <div className="w-0 h-0 border-l-[40px] border-l-transparent border-r-[40px] border-r-transparent border-b-[60px] border-b-foreground" />
+      </div>
+
       {/* Cat Eyes */}
       <div className="flex gap-16 items-center justify-center mb-4">
         <div className="relative">
