@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
+import { VoiceStartButton } from "./VoiceStartButton";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import hotelData from "@/data/hotel-data.json";
@@ -23,6 +24,7 @@ export const HotelChat = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const { toast } = useToast();
   const { speak, isSpeaking } = useTextToSpeech();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -34,6 +36,7 @@ export const HotelChat = () => {
   }, [messages]);
 
   const handleSend = async (message: string) => {
+    setShowChat(true);
     const userMessage: Message = { role: "user", content: message };
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
@@ -84,6 +87,14 @@ export const HotelChat = () => {
       setIsLoading(false);
     }
   };
+
+  if (!showChat) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center bg-gradient-mountain rounded-2xl shadow-2xl border border-border/50">
+        <VoiceStartButton onStart={() => setShowChat(true)} onSend={handleSend} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full bg-gradient-mountain rounded-2xl shadow-2xl overflow-hidden border border-border/50">
