@@ -81,15 +81,9 @@ export const HotelChat = () => {
     }
   };
 
-  const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-
   return (
     <div className="flex flex-col h-full bg-gradient-mountain rounded-2xl shadow-2xl border border-border/50">
-      <VoiceStartButton 
-        onSend={handleSend} 
-        isLoading={isLoading}
-        lastMessage={lastMessage}
-      />
+      <VoiceStartButton />
     </div>
   );
 };
