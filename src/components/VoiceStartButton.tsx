@@ -18,6 +18,7 @@ interface VoiceStartButtonProps {
 
 export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
   const [isConnected, setIsConnected] = useState(false);
+  const [isTalking, setIsTalking] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState("");
   const chatRef = useRef<RealtimeChat | null>(null);
@@ -43,13 +44,14 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
         () => {
           setIsConnected(true);
           toast({
-            title: "Подключено",
-            description: "Говорите с ассистентом",
+            title: "Готово",
+            description: "Удерживайте кнопку и говорите",
           });
         },
         () => {
           setIsConnected(false);
           setIsSpeaking(false);
+          setIsTalking(false);
           setCurrentTranscript("");
         }
       );
@@ -69,11 +71,25 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
     chatRef.current?.disconnect();
   };
 
+  const handleStartTalking = () => {
+    if (isConnected && !isTalking) {
+      setIsTalking(true);
+      chatRef.current?.enableMicrophone();
+    }
+  };
+
+  const handleStopTalking = () => {
+    if (isConnected && isTalking) {
+      setIsTalking(false);
+      chatRef.current?.disableMicrophone();
+    }
+  };
+
   const handleClick = () => {
-    if (isConnected) {
-      endConversation();
-    } else {
+    if (!isConnected) {
       startConversation();
+    } else {
+      endConversation();
     }
   };
 
@@ -116,7 +132,7 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
       
       {/* Cat Nose Button */}
       <div className="relative">
-        {isSpeaking && (
+        {(isTalking || isSpeaking) && (
           <>
             <div className="absolute inset-0 rounded-3xl bg-primary/30 animate-wave" style={{ animationDelay: '0s' }} />
             <div className="absolute inset-0 rounded-3xl bg-primary/30 animate-wave" style={{ animationDelay: '0.5s' }} />
@@ -131,11 +147,18 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
         
         <Button
           onClick={handleClick}
+          onMouseDown={isConnected ? handleStartTalking : undefined}
+          onMouseUp={isConnected ? handleStopTalking : undefined}
+          onMouseLeave={isConnected ? handleStopTalking : undefined}
+          onTouchStart={isConnected ? handleStartTalking : undefined}
+          onTouchEnd={isConnected ? handleStopTalking : undefined}
           disabled={isLoading}
           className={cn(
-            "relative z-10 h-[280px] w-[280px] transition-all shadow-2xl flex flex-col gap-6",
+            "relative z-10 h-[280px] w-[280px] transition-all shadow-2xl flex flex-col gap-6 select-none",
             isConnected
-              ? "bg-destructive hover:bg-destructive/90 rounded-[50%]"
+              ? isTalking
+                ? "bg-destructive hover:bg-destructive/90 rounded-[50%]"
+                : "bg-primary hover:bg-primary/90 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]"
               : "bg-gradient-to-br from-zinc-700 via-zinc-600 to-pink-400 hover:opacity-90 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]"
           )}
         >
@@ -145,7 +168,7 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
             <>
               <Mic className="w-24 h-24 text-white" />
               <span className="text-2xl font-semibold text-white">
-                {isConnected ? "STOP" : "TAP HERE"}
+                {isConnected ? (isTalking ? "ГОВОРЮ..." : "ДЕРЖИ") : "TAP HERE"}
               </span>
             </>
           )}
@@ -162,9 +185,15 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
         )}
       </div>
 
+      {isTalking && (
+        <p className="text-lg text-primary font-semibold animate-pulse">
+          Слушаю...
+        </p>
+      )}
+
       {isSpeaking && (
         <p className="text-lg text-muted-foreground animate-pulse">
-          Говорит...
+          Отвечает...
         </p>
       )}
 
