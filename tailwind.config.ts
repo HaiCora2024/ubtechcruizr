@@ -47,6 +47,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        spa: {
+          DEFAULT: "hsl(160 60% 45%)",
+          light: "hsl(160 50% 70%)",
+          dark: "hsl(160 70% 30%)",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
