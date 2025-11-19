@@ -41,27 +41,37 @@ export const VoiceStartButton = ({ onStart, onSend }: VoiceStartButtonProps) => 
         </p>
       </div>
       
-      <Button
-        onClick={handleClick}
-        disabled={isProcessing}
-        className={cn(
-          "h-[280px] w-[280px] rounded-3xl transition-all shadow-2xl flex flex-col gap-6",
-          isRecording
-            ? "bg-destructive hover:bg-destructive/90 animate-pulse"
-            : "bg-gradient-to-br from-primary to-spa hover:opacity-90"
-        )}
-      >
-        {isProcessing ? (
-          <Loader2 className="w-24 h-24 animate-spin" />
-        ) : (
+      <div className="relative">
+        {isRecording && (
           <>
-            <Mic className="w-24 h-24" />
-            <span className="text-2xl font-semibold">
-              {isRecording ? "Tap to Stop" : "Start Here"}
-            </span>
+            <div className="absolute inset-0 rounded-3xl bg-destructive/30 animate-wave" style={{ animationDelay: '0s' }} />
+            <div className="absolute inset-0 rounded-3xl bg-destructive/30 animate-wave" style={{ animationDelay: '0.5s' }} />
+            <div className="absolute inset-0 rounded-3xl bg-destructive/30 animate-wave" style={{ animationDelay: '1s' }} />
           </>
         )}
-      </Button>
+        
+        <Button
+          onClick={handleClick}
+          disabled={isProcessing}
+          className={cn(
+            "relative z-10 h-[280px] w-[280px] rounded-3xl transition-all shadow-2xl flex flex-col gap-6",
+            isRecording
+              ? "bg-destructive hover:bg-destructive/90"
+              : "bg-gradient-to-br from-primary to-spa hover:opacity-90"
+          )}
+        >
+          {isProcessing ? (
+            <Loader2 className="w-24 h-24 animate-spin" />
+          ) : (
+            <>
+              <Mic className="w-24 h-24" />
+              <span className="text-2xl font-semibold">
+                {isRecording ? "Tap to Stop" : "TAP HERE"}
+              </span>
+            </>
+          )}
+        </Button>
+      </div>
 
       {isRecording && (
         <p className="text-lg text-muted-foreground animate-pulse">
