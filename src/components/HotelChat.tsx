@@ -5,6 +5,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import hotelData from "@/data/hotel-data.json";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
+import { Volume2, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Message {
   role: "user" | "assistant";
@@ -19,7 +22,9 @@ export const HotelChat = () => {
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(true);
   const { toast } = useToast();
+  const { speak, isSpeaking } = useTextToSpeech();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,6 +54,11 @@ export const HotelChat = () => {
       };
       
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Auto-speak response if enabled
+      if (autoSpeak) {
+        await speak(data.response);
+      }
     } catch (error: any) {
       console.error('Chat error:', error);
       
@@ -78,8 +88,21 @@ export const HotelChat = () => {
   return (
     <div className="flex flex-col h-full bg-gradient-mountain rounded-2xl shadow-2xl overflow-hidden border border-border/50">
       <div className="bg-gradient-to-r from-primary to-spa p-6 text-primary-foreground">
-        <h2 className="text-2xl font-bold">Hotel Panorama & Spa</h2>
-        <p className="text-sm opacity-90 mt-1">Zakopane • Wirtualny Asystent</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-2xl font-bold">Hotel Panorama & Spa</h2>
+            <p className="text-sm opacity-90 mt-1">Zakopane • Wirtualny Asystent</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setAutoSpeak(!autoSpeak)}
+            className="text-primary-foreground hover:bg-primary-foreground/20"
+            title={autoSpeak ? "Wyłącz automatyczne odpowiedzi głosowe" : "Włącz automatyczne odpowiedzi głosowe"}
+          >
+            {autoSpeak ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+          </Button>
+        </div>
       </div>
 
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
