@@ -117,7 +117,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "wave": "wave 2s ease-out infinite",
         "marquee": "marquee 20s linear infinite",
-        "blink": "blink 0.2s ease-in-out 3s infinite",
+        "blink": "blink 0.2s ease-in-out 5.5s infinite",
       },
     },
   },
