@@ -1,9 +1,11 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { RealtimeChat } from "@/utils/RealtimeAudio";
 import { useToast } from "@/hooks/use-toast";
+import { useAudioRecorder } from "@/hooks/useAudioRecorder";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: "user" | "assistant";
@@ -17,79 +19,45 @@ interface VoiceStartButtonProps {
 }
 
 export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
-  const [isConnected, setIsConnected] = useState(false);
-  const [isTalking, setIsTalking] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState("");
-  const chatRef = useRef<RealtimeChat | null>(null);
   const { toast } = useToast();
+  const { isRecording, isProcessing, startRecording, stopRecording } = useAudioRecorder();
+  const { speak, isSpeaking } = useTextToSpeech();
 
-  const handleMessage = (event: any) => {
-    console.log('Received message type:', event.type);
-    
-    if (event.type === 'response.audio_transcript.delta') {
-      setCurrentTranscript(prev => prev + event.delta);
-      setIsSpeaking(true);
-    } else if (event.type === 'response.audio_transcript.done') {
-      setIsSpeaking(false);
-    } else if (event.type === 'response.done') {
-      setTimeout(() => setCurrentTranscript(""), 3000);
+  const handleStartTalking = async () => {
+    if (!isRecording && !isProcessing && !isSpeaking) {
+      await startRecording();
     }
   };
 
-  const startConversation = async () => {
-    try {
-      chatRef.current = new RealtimeChat(
-        handleMessage,
-        () => {
-          setIsConnected(true);
-          toast({
-            title: "Готово",
-            description: "Удерживайте кнопку и говорите",
-          });
-        },
-        () => {
-          setIsConnected(false);
-          setIsSpeaking(false);
-          setIsTalking(false);
-          setCurrentTranscript("");
-        }
-      );
-      
-      await chatRef.current.init();
-    } catch (error) {
-      console.error('Error starting conversation:', error);
-      toast({
-        title: "Ошибка",
-        description: error instanceof Error ? error.message : 'Не удалось начать разговор',
-        variant: "destructive",
-      });
-    }
-  };
+  const handleStopTalking = async () => {
+    if (isRecording) {
+      try {
+        const transcribedText = await stopRecording();
+        setCurrentTranscript(transcribedText);
+        
+        // Send to chat
+        const { data, error } = await supabase.functions.invoke('hotel-chat', {
+          body: { message: transcribedText }
+        });
 
-  const endConversation = () => {
-    chatRef.current?.disconnect();
-  };
+        if (error) throw error;
 
-  const handleStartTalking = () => {
-    if (isConnected && !isTalking) {
-      setIsTalking(true);
-      chatRef.current?.enableMicrophone();
-    }
-  };
-
-  const handleStopTalking = () => {
-    if (isConnected && isTalking) {
-      setIsTalking(false);
-      chatRef.current?.disableMicrophone();
-    }
-  };
-
-  const handleClick = () => {
-    if (!isConnected) {
-      startConversation();
-    } else {
-      endConversation();
+        const assistantMessage = data.message;
+        setCurrentTranscript(assistantMessage);
+        
+        // Speak the response
+        await speak(assistantMessage);
+        
+        setTimeout(() => setCurrentTranscript(""), 3000);
+      } catch (error) {
+        console.error('Error processing voice:', error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось обработать запрос",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -132,7 +100,7 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
       
       {/* Cat Nose Button */}
       <div className="relative">
-        {(isTalking || isSpeaking) && (
+        {(isRecording || isSpeaking) && (
           <>
             <div className="absolute inset-0 rounded-3xl bg-primary/30 animate-wave" style={{ animationDelay: '0s' }} />
             <div className="absolute inset-0 rounded-3xl bg-primary/30 animate-wave" style={{ animationDelay: '0.5s' }} />
@@ -141,53 +109,44 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
         )}
         
         {/* Shadow under nose */}
-        {!isConnected && (
-          <div className="absolute top-[240px] left-1/2 -translate-x-1/2 w-[200px] h-[60px] bg-foreground/10 rounded-[50%] blur-xl" />
-        )}
+        <div className="absolute top-[240px] left-1/2 -translate-x-1/2 w-[200px] h-[60px] bg-foreground/10 rounded-[50%] blur-xl" />
         
         <Button
-          onClick={handleClick}
-          onMouseDown={isConnected ? handleStartTalking : undefined}
-          onMouseUp={isConnected ? handleStopTalking : undefined}
-          onMouseLeave={isConnected ? handleStopTalking : undefined}
-          onTouchStart={isConnected ? handleStartTalking : undefined}
-          onTouchEnd={isConnected ? handleStopTalking : undefined}
-          disabled={isLoading}
+          onMouseDown={handleStartTalking}
+          onMouseUp={handleStopTalking}
+          onMouseLeave={handleStopTalking}
+          onTouchStart={handleStartTalking}
+          onTouchEnd={handleStopTalking}
+          disabled={isLoading || isProcessing}
           className={cn(
             "relative z-10 h-[280px] w-[280px] transition-all shadow-2xl flex flex-col gap-6 select-none",
-            isConnected
-              ? isTalking
-                ? "bg-destructive hover:bg-destructive/90 rounded-[50%]"
-                : "bg-primary hover:bg-primary/90 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]"
+            isRecording
+              ? "bg-destructive hover:bg-destructive/90 rounded-[50%]"
               : "bg-gradient-to-br from-zinc-700 via-zinc-600 to-pink-400 hover:opacity-90 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]"
           )}
         >
-          {isLoading ? (
+          {isLoading || isProcessing ? (
             <Loader2 className="w-24 h-24 animate-spin text-white" />
           ) : (
             <>
               <Mic className="w-24 h-24 text-white" />
               <span className="text-2xl font-semibold text-white">
-                {isConnected ? (isTalking ? "ГОВОРЮ..." : "ДЕРЖИ") : "TAP HERE"}
+                {isRecording ? "ГОВОРЮ..." : "ДЕРЖИ"}
               </span>
             </>
           )}
         </Button>
-        
-        {/* Cat Whiskers */}
-        {!isConnected && (
-          <>
-            <div className="absolute left-[-80px] top-1/2 w-16 h-1 bg-foreground/30 rounded-full" />
-            <div className="absolute left-[-70px] top-[45%] w-14 h-1 bg-foreground/30 rounded-full" />
-            <div className="absolute right-[-80px] top-1/2 w-16 h-1 bg-foreground/30 rounded-full" />
-            <div className="absolute right-[-70px] top-[45%] w-14 h-1 bg-foreground/30 rounded-full" />
-          </>
-        )}
       </div>
 
-      {isTalking && (
+      {isRecording && (
         <p className="text-lg text-primary font-semibold animate-pulse">
           Слушаю...
+        </p>
+      )}
+
+      {isProcessing && (
+        <p className="text-lg text-muted-foreground animate-pulse">
+          Обрабатываю...
         </p>
       )}
 
