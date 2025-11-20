@@ -7,6 +7,8 @@ import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import alpineBackground from "@/assets/alpine-background.jpg";
+import { RestaurantMenu } from "./RestaurantMenu";
+import { SpaMenu } from "./SpaMenu";
 
 interface Message {
   role: "user" | "assistant";
@@ -19,9 +21,12 @@ interface VoiceStartButtonProps {
   lastMessage?: Message | null;
 }
 
+type ViewMode = 'main' | 'restaurant' | 'spa';
+
 export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
   const [currentTranscript, setCurrentTranscript] = useState("");
   const [audioLevel, setAudioLevel] = useState(0);
+  const [viewMode, setViewMode] = useState<ViewMode>('main');
   const { toast } = useToast();
   const { isRecording, isProcessing, startRecording, stopRecording } = useAudioRecorder();
   const { speak, isSpeaking } = useTextToSpeech();
@@ -112,6 +117,15 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
     return "";
   };
 
+  // Handle view mode changes
+  if (viewMode === 'restaurant') {
+    return <RestaurantMenu onBack={() => setViewMode('main')} />;
+  }
+
+  if (viewMode === 'spa') {
+    return <SpaMenu onBack={() => setViewMode('main')} />;
+  }
+
   return (
     <div 
       className="flex flex-col h-full relative"
@@ -136,8 +150,8 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
       <div className="flex items-center justify-center gap-12 flex-1 px-8">
         {/* Left button - Restauracja */}
         <Button
-          onClick={() => {/* TODO: Navigate to restaurant menu */}}
-          className="h-32 w-32 rounded-full bg-primary/90 hover:bg-primary flex flex-col gap-2 shadow-2xl"
+          onClick={() => setViewMode('restaurant')}
+          className="h-32 w-32 rounded-full bg-primary/90 hover:bg-primary flex flex-col gap-2 shadow-2xl hover-scale"
         >
           <UtensilsCrossed className="w-12 h-12 text-white" />
           <span className="text-white font-semibold">Restauracja</span>
@@ -194,8 +208,8 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
 
         {/* Right button - Spa & Wellness */}
         <Button
-          onClick={() => {/* TODO: Navigate to spa menu */}}
-          className="h-32 w-32 rounded-full bg-primary/90 hover:bg-primary flex flex-col gap-2 shadow-2xl"
+          onClick={() => setViewMode('spa')}
+          className="h-32 w-32 rounded-full bg-primary/90 hover:bg-primary flex flex-col gap-2 shadow-2xl hover-scale"
         >
           <Droplet className="w-12 h-12 text-white" />
           <span className="text-white font-semibold">Spa & Wellness</span>
