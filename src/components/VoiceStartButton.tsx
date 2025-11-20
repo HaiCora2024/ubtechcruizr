@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, Loader2 } from "lucide-react";
+import { Mic, Loader2, UtensilsCrossed, Droplet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
@@ -106,112 +106,111 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
 
   const getStatusText = () => {
     if (isProcessing) return "Przetwarzam...";
-    if (isRecording) return "Nagrywam...";
+    if (isRecording) return "Słucham...";
     return "Naciśnij, aby mówić";
   };
 
   const getStatusColor = () => {
-    if (isProcessing) return "text-amber-500";
-    if (isRecording) return "text-destructive";
-    return "text-primary";
+    if (isProcessing) return "";
+    if (isRecording) return "";
+    return "";
   };
 
   return (
     <div 
-      className="flex items-center justify-between h-full gap-6 px-8 py-4 relative"
+      className="flex flex-col h-full relative"
       style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${alpineBackground})`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${alpineBackground})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Left side: Logo and Eyes */}
-      <div className="flex flex-col items-center gap-3 w-64">
-        <h1 className="text-3xl font-bold text-primary text-center">
+      {/* Header - Logo centered at top */}
+      <div className="flex flex-col items-center gap-2 pt-6 pb-4">
+        <h1 className="text-4xl font-bold text-white text-center">
           Hotel Panorama & Spa
         </h1>
-        <p className="text-sm text-muted-foreground text-center">
+        <p className="text-lg text-white/90 text-center">
           Wirtualny Asystent Recepcji
         </p>
-        
-        {/* Cat Ears - smaller */}
-        <div className="flex gap-24 items-center justify-center mt-2">
-          <div className="w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-b-[30px] border-b-foreground/60 transform -rotate-12" />
-          <div className="w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-b-[30px] border-b-foreground/60 transform rotate-12" />
-        </div>
-
-        {/* Cat Eyes - separated */}
-        <div className="flex gap-20 items-center justify-center">
-          <div className="w-12 h-12 bg-foreground/60 rounded-full flex items-center justify-center">
-            <div className={cn(
-              "w-6 h-6 bg-background rounded-full transition-all duration-300",
-              isSpeaking && "animate-pulse"
-            )} />
-          </div>
-          <div className="w-12 h-12 bg-foreground/60 rounded-full flex items-center justify-center">
-            <div className={cn(
-              "w-6 h-6 bg-background rounded-full transition-all duration-300",
-              isSpeaking && "animate-pulse"
-            )} />
-          </div>
-        </div>
       </div>
 
-      {/* Center: Button with audio indicator */}
-      <div className="flex flex-col items-center gap-4 flex-1">
-        <div className="relative">
-          {(isRecording || isSpeaking) && (
-            <>
-              <div className="absolute inset-0 rounded-full bg-primary/20 animate-wave" style={{ animationDelay: '0s' }} />
-              <div className="absolute inset-0 rounded-full bg-primary/20 animate-wave" style={{ animationDelay: '0.3s' }} />
-              <div className="absolute inset-0 rounded-full bg-primary/20 animate-wave" style={{ animationDelay: '0.6s' }} />
-            </>
-          )}
-          
-          <Button
-            onClick={handleToggleRecording}
-            disabled={isLoading || isProcessing}
-            className={cn(
-              "relative z-10 h-40 w-40 rounded-full transition-all shadow-2xl flex flex-col gap-3",
-              isRecording && "bg-destructive hover:bg-destructive/90",
-              isProcessing && "bg-amber-500 hover:bg-amber-500/90",
-              !isRecording && !isProcessing && "bg-primary hover:bg-primary/90"
-            )}
-          >
-            {isLoading || isProcessing ? (
-              <Loader2 className="w-16 h-16 animate-spin text-white" />
-            ) : (
+      {/* Main content area */}
+      <div className="flex items-center justify-center gap-12 flex-1 px-8">
+        {/* Left button - Restauracja */}
+        <Button
+          onClick={() => {/* TODO: Navigate to restaurant menu */}}
+          className="h-32 w-32 rounded-full bg-primary/90 hover:bg-primary flex flex-col gap-2 shadow-2xl"
+        >
+          <UtensilsCrossed className="w-12 h-12 text-white" />
+          <span className="text-white font-semibold">Restauracja</span>
+        </Button>
+
+        {/* Center - Main microphone button */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            {(isRecording || isSpeaking) && (
               <>
-                <Mic className="w-16 h-16 text-white" />
-                {isRecording && (
-                  <div className="flex gap-1 items-end justify-center h-8">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-1.5 bg-white rounded-full transition-all duration-150"
-                        style={{
-                          height: `${Math.max(8, audioLevel * 32 * (1 + Math.sin(Date.now() / 100 + i) * 0.5))}px`,
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
+                <div className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave" style={{ animationDelay: '0s' }} />
+                <div className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave" style={{ animationDelay: '0.3s' }} />
+                <div className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave" style={{ animationDelay: '0.6s' }} />
               </>
             )}
-          </Button>
+            
+            <Button
+              onClick={handleToggleRecording}
+              disabled={isLoading || isProcessing}
+              className={cn(
+                "relative z-10 h-48 w-48 rounded-full transition-all shadow-2xl flex flex-col gap-3 border-4",
+                isRecording && "bg-destructive hover:bg-destructive/90 border-orange-500",
+                isProcessing && "bg-amber-500 hover:bg-amber-500/90 border-orange-500",
+                !isRecording && !isProcessing && "bg-primary hover:bg-primary/90 border-orange-500"
+              )}
+            >
+              {isLoading || isProcessing ? (
+                <Loader2 className="w-24 h-24 animate-spin text-white" />
+              ) : (
+                <>
+                  <Mic className="w-24 h-24 text-white" />
+                  {isRecording && (
+                    <div className="flex gap-1 items-end justify-center h-8">
+                      {[...Array(5)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="w-2 bg-white rounded-full transition-all duration-150"
+                          style={{
+                            height: `${Math.max(8, audioLevel * 32 * (1 + Math.sin(Date.now() / 100 + i) * 0.5))}px`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </Button>
+          </div>
+
+          <p className={cn("text-xl font-semibold transition-colors text-white", getStatusColor())}>
+            {getStatusText()}
+          </p>
         </div>
 
-        <p className={cn("text-lg font-semibold transition-colors", getStatusColor())}>
-          {getStatusText()}
-        </p>
+        {/* Right button - Spa & Wellness */}
+        <Button
+          onClick={() => {/* TODO: Navigate to spa menu */}}
+          className="h-32 w-32 rounded-full bg-primary/90 hover:bg-primary flex flex-col gap-2 shadow-2xl"
+        >
+          <Droplet className="w-12 h-12 text-white" />
+          <span className="text-white font-semibold">Spa & Wellness</span>
+        </Button>
       </div>
 
-      {/* Right side: Transcript */}
-      <div className="w-80 flex items-center">
+      {/* Transcript at bottom */}
+      <div className="px-8 pb-6 flex justify-center">
         {currentTranscript && (
-          <div className="bg-card/90 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-border">
-            <p className="text-sm text-foreground leading-relaxed">
+          <div className="bg-card/95 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-border max-w-2xl">
+            <p className="text-base text-foreground leading-relaxed text-center">
               {currentTranscript}
             </p>
           </div>
