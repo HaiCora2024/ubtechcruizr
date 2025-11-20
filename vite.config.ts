@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(), 
     legacy({
-      targets: ['chrome 49', 'android 5'],
+      targets: ['chrome 49', 'Android >= 5'],
       additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
       renderLegacyChunks: true,
       polyfills: [
