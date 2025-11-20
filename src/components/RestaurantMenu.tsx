@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Clock } from "lucide-react";
+import { ArrowLeft, Clock, Mic, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAudioRecorder } from "@/hooks/useAudioRecorder";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import foodBreakfast from "@/assets/food-breakfast.jpg";
 import foodSoup from "@/assets/food-soup.jpg";
 import foodMain from "@/assets/food-main.jpg";
@@ -52,8 +56,44 @@ const menuItems = [
 ];
 
 export const RestaurantMenu = ({ onBack }: RestaurantMenuProps) => {
+  const [currentTranscript, setCurrentTranscript] = useState("");
+  const { isRecording, isProcessing, startRecording, stopRecording } = useAudioRecorder();
+  const { speak, isSpeaking } = useTextToSpeech();
+
+  const handleToggleRecording = async () => {
+    if (isRecording) {
+      try {
+        const transcribedText = await stopRecording();
+        setCurrentTranscript(transcribedText);
+        
+        const { data, error } = await supabase.functions.invoke('hotel-chat', {
+          body: { message: transcribedText }
+        });
+
+        if (error) throw error;
+
+        const assistantMessage = data.message;
+        setCurrentTranscript(assistantMessage);
+        
+        await speak(assistantMessage);
+        
+        setTimeout(() => setCurrentTranscript(""), 5000);
+      } catch (error) {
+        console.error('Error processing voice:', error);
+      }
+    } else if (!isProcessing && !isSpeaking) {
+      await startRecording();
+    }
+  };
+
+  const getStatusText = () => {
+    if (isProcessing) return "Przetwarzam...";
+    if (isRecording) return "Słucham...";
+    return "Naciśnij, aby mówić";
+  };
+
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-background via-background to-primary/5 animate-fade-in">
+    <div className="flex flex-col h-full bg-gradient-to-br from-background via-background to-primary/5 animate-fade-in relative">
       {/* Header */}
       <div className="flex items-center justify-between px-8 py-6 bg-primary/10 backdrop-blur-sm border-b border-primary/20">
         <Button
@@ -128,6 +168,47 @@ export const RestaurantMenu = ({ onBack }: RestaurantMenuProps) => {
       <div className="px-8 py-4 bg-card/50 backdrop-blur-sm border-t border-border/50 text-center text-sm text-muted-foreground">
         <p>Wszystkie dania przygotowywane są ze świeżych, lokalnych produktów</p>
         <p className="mt-1">All dishes are prepared with fresh, local ingredients</p>
+      </div>
+
+      {/* Voice Assistant Button - Fixed Bottom Left */}
+      <div className="fixed bottom-8 left-8 z-50 flex flex-col items-center gap-3">
+        {currentTranscript && (
+          <div className="bg-card/95 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-border max-w-xs mb-2 animate-fade-in">
+            <p className="text-sm text-foreground leading-relaxed">
+              {currentTranscript}
+            </p>
+          </div>
+        )}
+        
+        <div className="relative">
+          {(isRecording || isSpeaking) && (
+            <>
+              <div className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave" style={{ animationDelay: '0s' }} />
+              <div className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave" style={{ animationDelay: '0.3s' }} />
+            </>
+          )}
+          
+          <Button
+            onClick={handleToggleRecording}
+            disabled={isProcessing}
+            className={cn(
+              "relative z-10 h-20 w-20 rounded-full transition-all shadow-2xl border-2",
+              isRecording && "bg-destructive hover:bg-destructive/90 border-orange-500",
+              isProcessing && "bg-amber-500 hover:bg-amber-500/90 border-orange-500",
+              !isRecording && !isProcessing && "bg-primary hover:bg-primary/90 border-orange-500"
+            )}
+          >
+            {isProcessing ? (
+              <Loader2 className="w-10 h-10 animate-spin text-white" />
+            ) : (
+              <Mic className="w-10 h-10 text-white" />
+            )}
+          </Button>
+        </div>
+        
+        <p className="text-xs font-semibold text-white drop-shadow-lg">
+          {getStatusText()}
+        </p>
       </div>
     </div>
   );
