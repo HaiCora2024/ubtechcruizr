@@ -52,13 +52,19 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY not configured');
     }
 
-    console.log('Processing audio for transcription');
+    console.log('Processing audio for transcription, base64 length:', audio.length);
     const binaryAudio = processBase64Chunks(audio);
+    console.log('Binary audio size:', binaryAudio.length, 'bytes');
+    
+    if (binaryAudio.length < 100) {
+      throw new Error('Audio file too small - minimum 100 bytes required');
+    }
     
     const formData = new FormData();
     const blob = new Blob([binaryAudio], { type: 'audio/webm' });
     formData.append('file', blob, 'audio.webm');
     formData.append('model', 'whisper-1');
+    formData.append('language', 'pl');
 
     const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',

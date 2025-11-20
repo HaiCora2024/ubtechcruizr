@@ -93,11 +93,7 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
         setTimeout(() => setCurrentTranscript(""), 5000);
       } catch (error) {
         console.error('Error processing voice:', error);
-        toast({
-          title: "Błąd",
-          description: "Nie udało się przetworzyć zapytania",
-          variant: "destructive",
-        });
+        // Error is already handled by useAudioRecorder with Polish message
       }
     } else if (!isProcessing && !isSpeaking) {
       await startRecording();
