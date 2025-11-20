@@ -13,15 +13,18 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(), 
     legacy({
-      targets: ['chrome 49', 'Android >= 5'],
+      targets: ['defaults', 'not IE 11'],
       additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
       renderLegacyChunks: true,
+      modernPolyfills: true,
       polyfills: [
         'es.symbol',
         'es.array.iterator',
         'es.promise',
         'es.object.assign',
         'es.promise.finally',
+        'es.string.includes',
+        'es.array.includes',
       ],
     }),
     mode === "development" && componentTagger()
