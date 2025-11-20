@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import foodBreakfast from "@/assets/food-breakfast.jpg";
+import foodSoup from "@/assets/food-soup.jpg";
+import foodMain from "@/assets/food-main.jpg";
+import foodDessert from "@/assets/food-dessert.jpg";
 
 interface RestaurantMenuProps {
   onBack: () => void;
@@ -9,6 +13,7 @@ interface RestaurantMenuProps {
 const menuItems = [
   {
     category: "Śniadania / Breakfast",
+    image: foodBreakfast,
     items: [
       { name: "Jajecznica na maśle", name_en: "Scrambled eggs", price: "28 PLN" },
       { name: "Omlet z warzywami", name_en: "Vegetable omelette", price: "32 PLN" },
@@ -18,6 +23,7 @@ const menuItems = [
   },
   {
     category: "Zupy / Soups",
+    image: foodSoup,
     items: [
       { name: "Żurek góralski", name_en: "Highland sour soup", price: "22 PLN" },
       { name: "Rosół z makaronem", name_en: "Chicken broth with noodles", price: "20 PLN" },
@@ -26,6 +32,7 @@ const menuItems = [
   },
   {
     category: "Dania główne / Main courses",
+    image: foodMain,
     items: [
       { name: "Schab z kapustą i ziemniakami", name_en: "Pork chop with cabbage", price: "48 PLN" },
       { name: "Filet z łososia na grillu", name_en: "Grilled salmon fillet", price: "58 PLN" },
@@ -35,6 +42,7 @@ const menuItems = [
   },
   {
     category: "Desery / Desserts",
+    image: foodDessert,
     items: [
       { name: "Szarlotka z lodami", name_en: "Apple pie with ice cream", price: "22 PLN" },
       { name: "Sernik tradycyjny", name_en: "Traditional cheesecake", price: "20 PLN" },
@@ -72,15 +80,26 @@ export const RestaurantMenu = ({ onBack }: RestaurantMenuProps) => {
             <div 
               key={section.category}
               className={cn(
-                "bg-card/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-border/50 animate-scale-in",
+                "bg-card/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-border/50 animate-scale-in",
                 "hover:shadow-xl transition-shadow duration-300"
               )}
               style={{ animationDelay: `${sectionIdx * 0.1}s` }}
             >
-              <h2 className="text-2xl font-bold text-primary mb-4 pb-2 border-b border-primary/30">
-                {section.category}
-              </h2>
-              <div className="space-y-3">
+              {/* Category Image */}
+              <div className="relative h-48 overflow-hidden">
+                <img 
+                  src={section.image} 
+                  alt={section.category}
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/50 to-transparent" />
+                <h2 className="absolute bottom-4 left-6 text-3xl font-bold text-white drop-shadow-lg">
+                  {section.category}
+                </h2>
+              </div>
+
+              {/* Menu Items */}
+              <div className="p-6 space-y-3">
                 {section.items.map((item, itemIdx) => (
                   <div 
                     key={itemIdx}

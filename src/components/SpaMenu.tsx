@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Clock, Droplet, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import spaMassage from "@/assets/spa-massage.jpg";
+import spaFacial from "@/assets/spa-facial.jpg";
+import spaSauna from "@/assets/spa-sauna.jpg";
+import spaPackage from "@/assets/spa-package.jpg";
 
 interface SpaMenuProps {
   onBack: () => void;
@@ -10,6 +14,7 @@ const spaServices = [
   {
     category: "Masaże / Massages",
     icon: Sparkles,
+    image: spaMassage,
     items: [
       { 
         name: "Masaż relaksacyjny całego ciała", 
@@ -40,6 +45,7 @@ const spaServices = [
   {
     category: "Zabiegi na twarz / Facial treatments",
     icon: Sparkles,
+    image: spaFacial,
     items: [
       { 
         name: "Oczyszczanie twarzy", 
@@ -64,6 +70,7 @@ const spaServices = [
   {
     category: "Sauna & Wellness",
     icon: Droplet,
+    image: spaSauna,
     items: [
       { 
         name: "Sauna fińska", 
@@ -94,6 +101,7 @@ const spaServices = [
   {
     category: "Pakiety / Packages",
     icon: Sparkles,
+    image: spaPackage,
     items: [
       { 
         name: "Pakiet Relaks (masaż + sauna)", 
@@ -151,18 +159,29 @@ export const SpaMenu = ({ onBack }: SpaMenuProps) => {
               <div 
                 key={section.category}
                 className={cn(
-                  "bg-card/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-border/50 animate-scale-in",
+                  "bg-card/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-border/50 animate-scale-in",
                   "hover:shadow-xl transition-shadow duration-300"
                 )}
                 style={{ animationDelay: `${sectionIdx * 0.1}s` }}
               >
-                <div className="flex items-center gap-3 mb-4 pb-2 border-b border-primary/30">
-                  <Icon className="w-6 h-6 text-primary" />
-                  <h2 className="text-2xl font-bold text-primary">
-                    {section.category}
-                  </h2>
+                {/* Category Image */}
+                <div className="relative h-56 overflow-hidden">
+                  <img 
+                    src={section.image} 
+                    alt={section.category}
+                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/60 to-transparent" />
+                  <div className="absolute bottom-4 left-6 flex items-center gap-3">
+                    <Icon className="w-8 h-8 text-primary drop-shadow-lg" />
+                    <h2 className="text-3xl font-bold text-white drop-shadow-lg">
+                      {section.category}
+                    </h2>
+                  </div>
                 </div>
-                <div className="space-y-3">
+
+                {/* Service Items */}
+                <div className="p-6 space-y-3">
                   {section.items.map((item, itemIdx) => (
                     <div 
                       key={itemIdx}
