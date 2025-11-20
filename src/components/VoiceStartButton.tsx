@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { supabase } from "@/integrations/supabase/client";
+import alpineBackground from "@/assets/alpine-background.jpg";
 
 interface Message {
   role: "user" | "assistant";
@@ -116,7 +117,15 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
   };
 
   return (
-    <div className="flex items-center justify-between h-full gap-6 px-8 py-4">
+    <div 
+      className="flex items-center justify-between h-full gap-6 px-8 py-4 relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${alpineBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       {/* Left side: Logo and Eyes */}
       <div className="flex flex-col items-center gap-3 w-64">
         <h1 className="text-3xl font-bold text-primary text-center">
