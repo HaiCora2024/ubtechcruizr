@@ -66,12 +66,16 @@ export const useTextToSpeech = () => {
       console.log('Generating speech for:', text.substring(0, 50));
 
       // Turn on lights and perform gesture when starting to speak
-      if (window.RobotBridge) {
-        console.log('Activating robot gestures');
-        window.RobotBridge.turnLightsOn();
-        const gesture = selectGesture(text);
-        console.log('Selected gesture:', gesture);
-        window.RobotBridge.performAction(gesture);
+      if (typeof window.RobotBridge !== 'undefined' && window.RobotBridge?.turnLightsOn) {
+        try {
+          console.log('Activating robot gestures');
+          window.RobotBridge.turnLightsOn();
+          const gesture = selectGesture(text);
+          console.log('Selected gesture:', gesture);
+          window.RobotBridge.performAction(gesture);
+        } catch (error) {
+          console.warn('RobotBridge error (non-critical):', error);
+        }
       }
 
       const { data, error } = await supabase.functions.invoke('text-to-speech', {
@@ -99,9 +103,13 @@ export const useTextToSpeech = () => {
         console.log('Speech playback finished');
         
         // Turn off lights when speech ends
-        if (window.RobotBridge) {
-          console.log('Deactivating robot lights');
-          window.RobotBridge.turnLightsOff();
+        if (typeof window.RobotBridge !== 'undefined' && window.RobotBridge?.turnLightsOff) {
+          try {
+            console.log('Deactivating robot lights');
+            window.RobotBridge.turnLightsOff();
+          } catch (error) {
+            console.warn('RobotBridge error (non-critical):', error);
+          }
         }
       };
 
@@ -111,8 +119,12 @@ export const useTextToSpeech = () => {
         console.error('Error playing audio');
         
         // Turn off lights on error
-        if (window.RobotBridge) {
-          window.RobotBridge.turnLightsOff();
+        if (typeof window.RobotBridge !== 'undefined' && window.RobotBridge?.turnLightsOff) {
+          try {
+            window.RobotBridge.turnLightsOff();
+          } catch (error) {
+            console.warn('RobotBridge error (non-critical):', error);
+          }
         }
       };
 
@@ -124,8 +136,12 @@ export const useTextToSpeech = () => {
       setIsSpeaking(false);
       
       // Turn off lights on error
-      if (window.RobotBridge) {
-        window.RobotBridge.turnLightsOff();
+      if (typeof window.RobotBridge !== 'undefined' && window.RobotBridge?.turnLightsOff) {
+        try {
+          window.RobotBridge.turnLightsOff();
+        } catch (error) {
+          console.warn('RobotBridge error (non-critical):', error);
+        }
       }
       
       toast({
