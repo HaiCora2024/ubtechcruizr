@@ -14,66 +14,27 @@ declare global {
   }
 }
 
-// Select gesture based on text content
-const selectGesture = (text: string): string => {
-  const lowerText = text.toLowerCase();
-
-  // Greetings
-  if (lowerText.includes("witaj") || lowerText.includes("cześć") || lowerText.includes("dzień dobry")) {
-    return "swingarm"; // wave
-  }
-
-  // Positive/celebration
-  if (lowerText.includes("gratulacje") || lowerText.includes("świetnie") || lowerText.includes("brawo")) {
-    return "celebrate";
-  }
-
-  // Questions/searching
-  if (lowerText.includes("?") || lowerText.includes("szukam") || lowerText.includes("gdzie")) {
-    return "searching";
-  }
-
-  // Goodbye
-  if (lowerText.includes("do widzenia") || lowerText.includes("żegnaj")) {
-    return "goodbye";
-  }
-
-  // Directions
-  if (lowerText.includes("prawo")) {
-    return "guideright";
-  }
-  if (lowerText.includes("lewo")) {
-    return "guideleft";
-  }
-
-  // Surprise
-  if (lowerText.includes("wow") || lowerText.includes("niesamowite")) {
-    return "surprise";
-  }
-
-  // Default talking gestures
-  const talkGestures = ["talk1", "talk2", "talk3", "talk5", "talk8"];
-  return talkGestures[Math.floor(Math.random() * talkGestures.length)];
-};
-
 export const useTextToSpeech = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const { toast } = useToast();
 
-  const speak = async (text: string, voice: string = "alloy") => {
+  const speak = async (text: string, voice: string = "alloy", gesture?: string) => {
     try {
       setIsSpeaking(true);
       console.log("Generating speech for:", text.substring(0, 50));
+      console.log("Using gesture:", gesture);
 
-      // ⭐ ИЗМЕНЕНО: Запускаем жесты асинхронно, чтобы не блокировать TTS
+      // ⭐ Запускаем жесты асинхронно с gesture из параметра
       if (typeof window.RobotBridge !== "undefined" && window.RobotBridge?.turnLightsOn) {
         setTimeout(() => {
           try {
             console.log("Activating robot gestures");
             window.RobotBridge!.turnLightsOn();
-            const gesture = selectGesture(text);
-            console.log("Selected gesture:", gesture);
-            window.RobotBridge!.performAction(gesture);
+
+            // Используем gesture из параметра или fallback
+            const selectedGesture = gesture || "talk1";
+            console.log("Selected gesture:", selectedGesture);
+            window.RobotBridge!.performAction(selectedGesture);
           } catch (error) {
             console.warn("RobotBridge error (non-critical):", error);
           }

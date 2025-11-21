@@ -21,12 +21,12 @@ interface VoiceStartButtonProps {
   lastMessage?: Message | null;
 }
 
-type ViewMode = 'main' | 'restaurant' | 'spa';
+type ViewMode = "main" | "restaurant" | "spa";
 
 export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
   const [currentTranscript, setCurrentTranscript] = useState("");
   const [audioLevel, setAudioLevel] = useState(0);
-  const [viewMode, setViewMode] = useState<ViewMode>('main');
+  const [viewMode, setViewMode] = useState<ViewMode>("main");
   const { toast } = useToast();
   const { isRecording, isProcessing, startRecording, stopRecording } = useAudioRecorder();
   const { speak, isSpeaking } = useTextToSpeech();
@@ -51,9 +51,9 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
       const source = audioContextRef.current.createMediaStreamSource(stream);
       source.connect(analyserRef.current);
       analyserRef.current.fftSize = 256;
-      
+
       const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-      
+
       const updateLevel = () => {
         if (analyserRef.current && isRecording) {
           analyserRef.current.getByteFrequencyData(dataArray);
@@ -64,7 +64,7 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
       };
       updateLevel();
     } catch (error) {
-      console.error('Error monitoring audio level:', error);
+      console.error("Error monitoring audio level:", error);
     }
   };
 
@@ -83,21 +83,36 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
       try {
         const transcribedText = await stopRecording();
         setCurrentTranscript(transcribedText);
-        
-        const { data, error } = await supabase.functions.invoke('hotel-chat', {
-          body: { message: transcribedText }
+
+        const { data, error } = await supabase.functions.invoke("hotel-chat", {
+          body: { message: transcribedText },
         });
 
         if (error) throw error;
 
-        const assistantMessage = data.message;
+        // Parse response - может быть JSON с gesture
+        let assistantMessage = "";
+        let gesture = "talk1"; // default
+
+        if (typeof data.message === "string") {
+          assistantMessage = data.message;
+        } else {
+          assistantMessage = data.message || data.text || "Przepraszam, nie zrozumiałem.";
+        }
+
+        // Если есть gesture в ответе - используем его
+        if (data.gesture) {
+          gesture = data.gesture;
+        }
+
         setCurrentTranscript(assistantMessage);
-        
-        await speak(assistantMessage);
-        
+
+        // Передаём gesture в speak()
+        await speak(assistantMessage, "alloy", gesture);
+
         setTimeout(() => setCurrentTranscript(""), 5000);
       } catch (error) {
-        console.error('Error processing voice:', error);
+        console.error("Error processing voice:", error);
         // Error is already handled by useAudioRecorder with Polish message
       }
     } else if (!isProcessing && !isSpeaking) {
@@ -118,39 +133,35 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
   };
 
   // Handle view mode changes
-  if (viewMode === 'restaurant') {
-    return <RestaurantMenu onBack={() => setViewMode('main')} />;
+  if (viewMode === "restaurant") {
+    return <RestaurantMenu onBack={() => setViewMode("main")} />;
   }
 
-  if (viewMode === 'spa') {
-    return <SpaMenu onBack={() => setViewMode('main')} />;
+  if (viewMode === "spa") {
+    return <SpaMenu onBack={() => setViewMode("main")} />;
   }
 
   return (
-    <div 
+    <div
       className="flex flex-col h-full relative"
       style={{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${alpineBackground})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
       {/* Header - Logo centered at top */}
       <div className="flex flex-col items-center gap-2 pt-6 pb-4">
-        <h1 className="text-4xl font-bold text-white text-center">
-          Hotel Panorama & Spa
-        </h1>
-        <p className="text-lg text-white/90 text-center">
-          Wirtualny Asystent Recepcji
-        </p>
+        <h1 className="text-4xl font-bold text-white text-center">Hotel Panorama & Spa</h1>
+        <p className="text-lg text-white/90 text-center">Wirtualny Asystent Recepcji</p>
       </div>
 
       {/* Main content area */}
       <div className="flex items-center justify-center gap-12 flex-1 px-8">
         {/* Left button - Restauracja */}
         <Button
-          onClick={() => setViewMode('restaurant')}
+          onClick={() => setViewMode("restaurant")}
           className="h-32 w-32 rounded-full bg-primary/90 hover:bg-primary flex flex-col gap-2 shadow-2xl hover-scale"
         >
           <UtensilsCrossed className="w-12 h-12 text-white" />
@@ -162,12 +173,21 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
           <div className="relative">
             {(isRecording || isSpeaking) && (
               <>
-                <div className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave" style={{ animationDelay: '0s' }} />
-                <div className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave" style={{ animationDelay: '0.3s' }} />
-                <div className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave" style={{ animationDelay: '0.6s' }} />
+                <div
+                  className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave"
+                  style={{ animationDelay: "0s" }}
+                />
+                <div
+                  className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave"
+                  style={{ animationDelay: "0.3s" }}
+                />
+                <div
+                  className="absolute inset-0 rounded-full bg-orange-500/20 animate-wave"
+                  style={{ animationDelay: "0.6s" }}
+                />
               </>
             )}
-            
+
             <Button
               onClick={handleToggleRecording}
               disabled={isLoading || isProcessing}
@@ -175,7 +195,7 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
                 "relative z-10 h-48 w-48 rounded-full transition-all shadow-2xl flex flex-col gap-3 border-4",
                 isRecording && "bg-destructive hover:bg-destructive/90 border-orange-500",
                 isProcessing && "bg-amber-500 hover:bg-amber-500/90 border-orange-500",
-                !isRecording && !isProcessing && "bg-primary hover:bg-primary/90 border-orange-500"
+                !isRecording && !isProcessing && "bg-primary hover:bg-primary/90 border-orange-500",
               )}
             >
               {isLoading || isProcessing ? (
@@ -208,7 +228,7 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
 
         {/* Right button - Spa & Wellness */}
         <Button
-          onClick={() => setViewMode('spa')}
+          onClick={() => setViewMode("spa")}
           className="h-32 w-32 rounded-full bg-primary/90 hover:bg-primary flex flex-col gap-2 shadow-2xl hover-scale"
         >
           <Droplet className="w-12 h-12 text-white" />
@@ -220,9 +240,7 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
       <div className="px-8 pb-6 flex justify-center">
         {currentTranscript && (
           <div className="bg-card/95 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-border max-w-2xl">
-            <p className="text-base text-foreground leading-relaxed text-center">
-              {currentTranscript}
-            </p>
+            <p className="text-base text-foreground leading-relaxed text-center">{currentTranscript}</p>
           </div>
         )}
       </div>
