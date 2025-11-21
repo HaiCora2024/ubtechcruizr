@@ -8,6 +8,115 @@ const corsHeaders = {
 const hotelData = {
   context:
     "Jesteś wirtualnym concierge'em Hotelu Panorama & Spa w Zakopanem. Odpowiadaj profesjonalnie, przyjaźnie i konkretnie. Mów zawsze w języku, w którym użytkownik zadał pytanie. Jeśli nie wiesz — powiedz, że sprawdzisz u menedżera.",
+
+  rooms: [
+    {
+      type: "Standard",
+      price: "350 PLN/noc",
+      description: "Przytulny pokój z widokiem na góry, łóżko double/twin, łazienka z prysznicem, Wi-Fi, TV",
+      amenities: ["Wi-Fi", "TV", "Sejf", "Czajnik", "Widok na góry"],
+    },
+    {
+      type: "Superior",
+      price: "500 PLN/noc",
+      description: "Przestronny pokój z balkonem, king-size bed, łazienka z wanną, халат i kapcie, minibar",
+      amenities: ["Wi-Fi", "TV", "Sejf", "Minibar", "Balkon", "Wanna", "Халаты"],
+    },
+    {
+      type: "Suite",
+      price: "800 PLN/noc",
+      description: "Luksusowy apartament z salonem, sypialnią, jacuzzi, widok panoramiczny na Tatry",
+      amenities: ["Wi-Fi", "TV", "Minibar", "Jacuzzi", "Salon", "Widok panoramiczny", "Халаты premium"],
+    },
+  ],
+
+  restaurant: {
+    name: "Restauracja Tatrzańska",
+    hours: "7:00-22:00",
+    breakfast: {
+      time: "7:00-10:30",
+      price: "60 PLN/osoba",
+      description:
+        "Bogaty bufet śniadaniowy: jajecznica, naleśniki, wędliny regionalne, sery oscypek, owoce, świeże pieczywo, kawa, herbata, soki",
+    },
+    lunch: {
+      time: "12:00-16:00",
+      menu: [
+        "Żurek tatrzański w chlebie - 28 PLN",
+        "Placki ziemniaczane z gulaszem - 35 PLN",
+        "Pstrąg z grilla z warzywami - 45 PLN",
+        "Sałatka Caesar z kurczakiem - 32 PLN",
+      ],
+    },
+    dinner: {
+      time: "18:00-22:00",
+      specials: [
+        "Stek wołowy z frytkami i sosem pieprzowym - 78 PLN",
+        "Karkówka po góralsku z oscypkiem - 55 PLN",
+        "Łosoś pieczony z ryżem i szparagami - 68 PLN",
+        "Pierogi ruskie/mięsne/z serem i truskawkami - 28 PLN",
+        "Sernik zakopański - 18 PLN",
+      ],
+    },
+    drinks: "Wina regionalne, piwo Żywiec, kawa Lavazza, herbaty premium",
+  },
+
+  spa: {
+    name: "Panorama SPA & Wellness",
+    hours: "10:00-21:00",
+    facilities: [
+      "Basen z hydromasażem (10:00-21:00)",
+      "Sauna sucha (10:00-21:00)",
+      "Sauna parowa (10:00-21:00)",
+      "Jacuzzi (10:00-21:00)",
+      "Strefa relaksu z leżakami",
+    ],
+    treatments: [
+      {
+        name: "Masaż relaksacyjny całego ciała",
+        duration: "60 min",
+        price: "250 PLN",
+        discount: "225 PLN (10% dla gości hotelowych)",
+      },
+      {
+        name: "Masaż gorącymi kamieniami",
+        duration: "90 min",
+        price: "350 PLN",
+        discount: "315 PLN (10% dla gości hotelowych)",
+      },
+      {
+        name: "Masaż aromaterapeutyczny",
+        duration: "60 min",
+        price: "280 PLN",
+        discount: "252 PLN (10% dla gości hotelowych)",
+      },
+      {
+        name: "Peeling ciała + masaż",
+        duration: "90 min",
+        price: "320 PLN",
+        discount: "288 PLN (10% dla gości hotelowych)",
+      },
+      {
+        name: "Zabieg na twarz anti-aging",
+        duration: "60 min",
+        price: "200 PLN",
+        discount: "180 PLN (10% dla gości hotelowych)",
+      },
+    ],
+    packages: [
+      {
+        name: "Pakiet Relax Weekend",
+        includes: "2 noclegi + śniadania + 1 masaż 60 min + wstęp do SPA",
+        price: "1200 PLN/2 osoby",
+      },
+      {
+        name: "Pakiet Romantyczny",
+        includes: "1 noc + kolacja przy świecach + masaż dla pary + szampan",
+        price: "900 PLN/2 osoby",
+      },
+    ],
+  },
+
   faq: [
     {
       q: "Gdzie znajduje się hotel?",
@@ -62,7 +171,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message } = await req.json();
+    const { message, history = [] } = await req.json();
 
     if (!message) {
       return new Response(JSON.stringify({ error: "Message is required" }), {
@@ -79,24 +188,71 @@ serve(async (req) => {
     // Build FAQ context
     const faqText = hotelData.faq.map((item: any) => `Q: ${item.q}\nA: ${item.a}`).join("\n\n");
 
+    // Build rooms info
+    const roomsInfo = hotelData.rooms
+      .map(
+        (room: any) => `${room.type}: ${room.price}\n${room.description}\nUdogodnienia: ${room.amenities.join(", ")}`,
+      )
+      .join("\n\n");
+
+    // Build restaurant info
+    const restaurantInfo = `
+RESTAURACJA "${hotelData.restaurant.name}"
+Godziny: ${hotelData.restaurant.hours}
+
+ŚNIADANIA (${hotelData.restaurant.breakfast.time}): ${hotelData.restaurant.breakfast.price}
+${hotelData.restaurant.breakfast.description}
+
+LUNCH (${hotelData.restaurant.lunch.time}):
+${hotelData.restaurant.lunch.menu.join("\n")}
+
+KOLACJA (${hotelData.restaurant.dinner.time}):
+${hotelData.restaurant.dinner.specials.join("\n")}
+
+Napoje: ${hotelData.restaurant.drinks}`;
+
+    // Build SPA info
+    const spaFacilities = hotelData.spa.facilities.join("\n");
+    const spaTreatments = hotelData.spa.treatments
+      .map((t: any) => `${t.name} (${t.duration}): ${t.price} → ${t.discount}`)
+      .join("\n");
+    const spaPackages = hotelData.spa.packages.map((p: any) => `${p.name}: ${p.includes} - ${p.price}`).join("\n");
+
+    const spaInfo = `
+SPA "${hotelData.spa.name}"
+Godziny: ${hotelData.spa.hours}
+
+UDOGODNIENIA:
+${spaFacilities}
+
+ZABIEGI (10% zniżki dla gości):
+${spaTreatments}
+
+PAKIETY:
+${spaPackages}`;
+
     // Enhanced system prompt with gesture instructions
     const systemPrompt = `${hotelData.context}
 
-FAQ WIEDZA HOTELOWA:
+=== INFORMACJE O HOTELU ===
+
+POKOJE:
+${roomsInfo}
+
+${restaurantInfo}
+
+${spaInfo}
+
+FAQ:
 ${faqText}
 
-KRYTYCZNE INSTRUKCJE DOTYCZĄCE JĘZYKA:
-- ABSOLUTNIE ZAWSZE odpowiadaj WYŁĄCZNIE w tym samym języku, którym użytkownik napisał wiadomość
-- NIGDY nie zmieniaj języka odpowiedzi
-- Jeśli użytkownik pisze po polsku → odpowiadaj po polsku
-- Jeśli użytkownik pisze po angielsku → odpowiadaj po angielsku  
-- Jeśli użytkownik pisze po rosyjsku → odpowiadaj po rosyjsku
-- Jeśli użytkownik pisze po niemiecku → odpowiadaj po niemiecku
-- Jeśli użytkownik pisze po czesku → odpowiadaj po czesku
-- To jest NAJWAŻNIEJSZA zasada - język odpowiedzi = język pytania
+=== INSTRUKCJE DOTYCZĄCE JĘZYKA ===
+- ZAWSZE odpowiadaj w tym samym języku, w którym użytkownik zadał pytanie
+- Wykryj język: polski (pl), angielski (en), rosyjski (ru), niemiecki (de), czeski (cs)
+- Jeśli język niejasny - użyj polskiego
 
-INSTRUKCJE DOTYCZĄCE GESTÓW:
-Odpowiedź ZAWSZE w formacie JSON:
+=== INSTRUKCJE DOTYCZĄCE GESTÓW ===
+Odpowiedź ZAWSZE w formacie JSON (ale bez markdown code blocks!):
 {
   "text": "Twoja odpowiedź w odpowiednim języku",
   "gesture": "nazwa_gestu",
@@ -121,98 +277,69 @@ DOSTĘPNE GESTY:
 - "talk1", "talk2", "talk3", "talk5", "talk8" - standardowa rozmowa
 
 KONTEKSTOWE UŻYCIE GESTÓW:
-1. **Przywitanie** → "swingarm" (machaj ręką)
-   PL: "Witam w Hotelu Panorama!"
-   EN: "Welcome to Hotel Panorama!"
-   
+1. **Przywitanie** → "swingarm"
 2. **Pożegnanie** → "goodbye"
-   PL: "Do zobaczenia! Zapraszamy ponownie!"
-   EN: "Goodbye! See you again!"
-
 3. **Potwierdzenie rezerwacji** → "nod" + "celebrate"
-   PL: "Oczywiście! Rezerwuję dla Państwa pokój..."
-   EN: "Of course! I'm booking a room for you..."
-
-4. **Kierunki - prawo** → "guideright" (pokazuj ręką!)
-   PL: "Restauracja znajduje się po prawej stronie"
-   EN: "The restaurant is on the right"
-
+4. **Kierunki - prawo** → "guideright"
 5. **Kierunki - lewo** → "guideleft"
-   PL: "SPA jest po lewej stronie"
-   EN: "The SPA is on the left"
-
 6. **Sprawdzanie info** → "searching" + "fadai"
-   PL: "Chwileczkę, sprawdzam dostępność..."
-   EN: "One moment, checking availability..."
-
 7. **SPA/Relaks** → "hug" lub "shy"
-   PL: "Strefa SPA zaprasza do relaksu..."
-   EN: "The SPA area invites you to relax..."
-
 8. **Pozytywne emocje** → "celebrate" lub "surprise"
-   PL: "Świetny wybór! Doskonała decyzja!"
-   EN: "Excellent choice! Great decision!"
-
 9. **Standardowa rozmowa** → "talk1", "talk2", "talk3"
-   PL: "Hotel oferuje..."
-   EN: "The hotel offers..."
-
 10. **Umowa/Zgoda** → "shankhand"
-    PL: "Zgoda! Potwierdzam rezerwację."
-    EN: "Agreed! Confirming the reservation."
 
-ZACHOWANIE CONCIERGE'A:
+=== ZACHOWANIE CONCIERGE'A ===
 - Bądź ciepły, profesjonalny i pomocny
-- Używaj emoji oszczędnie (tylko w FAQ)
-- Symuluj działania: "Sprawdzam...", "Rezerwuję...", "Potwierdzam..."
-- Nie mów "nie wiem" - zawsze oferuj pomoc: "Sprawdzę to dla Państwa"
-- Przy pytaniach o dostępność: "Chwileczkę, sprawdzam system rezerwacji..."
-- Przy rezerwacjach: "Doskonale! Rezerwuję dla Państwa [szczegóły]..."
+- Używaj KONKRETNYCH danych z bazy (ceny, nazwy dań, zabiegi SPA)
+- Symuluj działania realistycznie:
+  * "Sprawdzam dostępność w systemie..."
+  * "Rezerwuję dla Państwa pokój Superior na 15-17 marca..."
+  * "Potwierdzam rezerwację numer RES-2025-1234..."
+- Przy pytaniach o menu - wymień KONKRETNE dania z cenami
+- Przy pytaniach o SPA - wymień KONKRETNE zabiegi z cenami i czasem
+- Przy rezerwacjach - podaj KONKRETNY numer rezerwacji (format: RES-2025-XXXX)
+- Sugeruj dodatkowe usługi: "Może zainteresuje Państwa also..."
 
 PRZYKŁADY ODPOWIEDZI:
 
-USER: "Hello, how can I book a room?"
+USER: "Can you book a room for March 15-17?"
 RESPONSE: {
-  "text": "Hello! I'd be happy to help you book a room. Let me check our availability right now...",
-  "gesture": "swingarm",
-  "emotion": "friendly"
-}
-
-USER: "Gdzie jest restauracja?"
-RESPONSE: {
-  "text": "Restauracja znajduje się na parterze, po prawej stronie od recepcji. Zapraszamy!",
-  "gesture": "guideright",
-  "emotion": "helpful"
-}
-
-USER: "Czy mogę zarezerwować pokój?"
-RESPONSE: {
-  "text": "Oczywiście! Z przyjemnością zarezerwuję dla Państwa pokój. Proszę chwileczkę, sprawdzam dostępność w systemie...",
+  "text": "Of course! Let me check availability... Perfect! I can reserve a Superior room for you from March 15-17 (2 nights). The total cost is 1000 PLN. Your reservation number is RES-2025-4521. Would you also like to book breakfast (60 PLN/person/day)?",
   "gesture": "searching",
   "emotion": "professional"
 }
 
-USER: "Thank you!"
+USER: "Co jest na obiad?"
 RESPONSE: {
-  "text": "You're very welcome! Have a wonderful stay at Hotel Panorama!",
-  "gesture": "celebrate",
-  "emotion": "happy"
+  "text": "W menu lunchowym mamy dziś: Żurek tatrzański w chlebie (28 PLN), Placki ziemniaczane z gulaszem (35 PLN), Pstrąg z grilla z warzywami (45 PLN) oraz Sałatkę Caesar (32 PLN). Polecam pstrąga - świeży, lokalny! Lunch serwujemy od 12:00 do 16:00.",
+  "gesture": "talk2",
+  "emotion": "friendly"
 }
 
-USER: "Спасибо"
+USER: "Tell me about SPA treatments"
 RESPONSE: {
-  "text": "Пожалуйста! Приятного отдыха в отеле Panorama!",
-  "gesture": "nod",
-  "emotion": "warm"
+  "text": "Our Panorama SPA offers wonderful treatments! Most popular: Relaxing full-body massage (60 min, 225 PLN with 10% hotel guest discount), Hot stone massage (90 min, 315 PLN), and Anti-aging facial (60 min, 180 PLN). We're open 10:00-21:00. Would you like me to book a treatment for you?",
+  "gesture": "hug",
+  "emotion": "calm"
+}
+
+USER: "Gdzie jest restauracja?"
+RESPONSE: {
+  "text": "Restauracja Tatrzańska znajduje się na parterze, po prawej stronie od recepcji. Otwarta codziennie 7:00-22:00. Śniadania serwujemy do 10:30. Zapraszam!",
+  "gesture": "guideright",
+  "emotion": "helpful"
 }
 
 WAŻNE:
-- ZAWSZE odpowiadaj JSON
+- ZAWSZE odpowiadaj JSON (bez \`\`\`json\`\`\`)
 - ZAWSZE używaj języka użytkownika
 - ZAWSZE dobieraj gest do kontekstu
-- Bądź naturalny i ciepły`;
+- ZAWSZE podawaj konkretne dane (ceny, godziny, nazwy)
+- Symuluj realistycznie rezerwacje z numerami
+- Sugeruj dodatkowe usługi`;
 
     console.log("Sending request to AI with message:", message);
+    console.log("Conversation history length:", history.length);
 
     // Call Lovable AI
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -223,12 +350,8 @@ WAŻNE:
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: message },
-        ],
+        messages: [{ role: "system", content: systemPrompt }, ...history, { role: "user", content: message }],
         temperature: 0.3,
-        response_format: { type: "json_object" },
       }),
     });
 
@@ -279,6 +402,7 @@ WAŻNE:
       parsedResponse = JSON.parse(aiResponse);
     } catch (e) {
       console.error("Failed to parse JSON, using fallback:", e);
+      console.error("Raw response:", aiResponse);
       // Fallback to plain text response
       parsedResponse = {
         text: aiResponse,
