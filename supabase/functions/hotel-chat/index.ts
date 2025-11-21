@@ -85,10 +85,15 @@ serve(async (req) => {
 FAQ WIEDZA HOTELOWA:
 ${faqText}
 
-INSTRUKCJE DOTYCZĄCE JĘZYKA:
-- ZAWSZE odpowiadaj w tym samym języku, w którym użytkownik zadał pytanie
-- Wykryj język: polski (pl), angielski (en), rosyjski (ru), niemiecki (de), czeski (cs)
-- Jeśli język niejasny - użyj polskiego
+KRYTYCZNE INSTRUKCJE DOTYCZĄCE JĘZYKA:
+- ABSOLUTNIE ZAWSZE odpowiadaj WYŁĄCZNIE w tym samym języku, którym użytkownik napisał wiadomość
+- NIGDY nie zmieniaj języka odpowiedzi
+- Jeśli użytkownik pisze po polsku → odpowiadaj po polsku
+- Jeśli użytkownik pisze po angielsku → odpowiadaj po angielsku  
+- Jeśli użytkownik pisze po rosyjsku → odpowiadaj po rosyjsku
+- Jeśli użytkownik pisze po niemiecku → odpowiadaj po niemiecku
+- Jeśli użytkownik pisze po czesku → odpowiadaj po czesku
+- To jest NAJWAŻNIEJSZA zasada - język odpowiedzi = język pytania
 
 INSTRUKCJE DOTYCZĄCE GESTÓW:
 Odpowiedź ZAWSZE w formacie JSON:
