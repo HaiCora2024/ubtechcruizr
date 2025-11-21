@@ -27,6 +27,8 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
   const [currentTranscript, setCurrentTranscript] = useState("");
   const [audioLevel, setAudioLevel] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>("main");
+  // ⭐ НОВОЕ: История разговора для контекста
+  const [conversationHistory, setConversationHistory] = useState<Array<{ role: string; content: string }>>([]);
   const { toast } = useToast();
   const { isRecording, isProcessing, startRecording, stopRecording } = useAudioRecorder();
   const { speak, isSpeaking } = useTextToSpeech();
@@ -84,8 +86,12 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
         const transcribedText = await stopRecording();
         setCurrentTranscript(transcribedText);
 
+        // ⭐ ИЗМЕНЕНО: Передаём историю разговора
         const { data, error } = await supabase.functions.invoke("hotel-chat", {
-          body: { message: transcribedText },
+          body: {
+            message: transcribedText,
+            history: conversationHistory, // ← Передаём весь контекст!
+          },
         });
 
         if (error) throw error;
@@ -106,6 +112,16 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
         }
 
         setCurrentTranscript(assistantMessage);
+
+        // ⭐ НОВОЕ: Сохраняем историю разговора
+        const newHistory = [
+          ...conversationHistory,
+          { role: "user", content: transcribedText },
+          { role: "assistant", content: assistantMessage },
+        ];
+        setConversationHistory(newHistory);
+
+        console.log("Conversation history updated:", newHistory.length, "messages");
 
         // Передаём gesture в speak()
         await speak(assistantMessage, "alloy", gesture);
