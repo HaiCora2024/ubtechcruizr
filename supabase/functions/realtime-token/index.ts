@@ -11,19 +11,23 @@ const hotelData = {
   "faq": [
     {
       "q": "Gdzie znajduje się hotel?",
-      "a": "📍 Adres: ul. Górska 15, 34-500 Zakopane, Polska. Link do mapy: https://maps.app.goo.gl/exampleHotel"
+      "a": "📍 Adres: ul. Mrągowska 34, 11-730 Mikołajki, Polska (Pojezierze Mazurskie)."
     },
     {
       "q": "Jakie są godziny zameldowania i wymeldowania?",
-      "a": "🕒 Zameldowanie od 14:00, wymeldowanie do 11:00."
+      "a": "🕒 Zameldowanie od 15:00, wymeldowanie do 11:00."
     },
     {
       "q": "Czy w hotelu jest spa?",
       "a": "💆‍♀️ Tak, strefa SPA jest czynna codziennie od 10:00 do 21:00. Goście hotelowi mają 10% zniżki na masaże."
     },
     {
+      "q": "Czy jest aquapark?",
+      "a": "🏊 Tak! Hotel posiada aquapark Tropikana z basenami, zjeżdżalniami i strefą dla dzieci."
+    },
+    {
       "q": "Czy można przyjechać z dziećmi?",
-      "a": "👨‍👩‍👧‍👦 Tak, dzieci są mile widziane! Dla najmłodszych przygotowaliśmy kącik zabaw i menu dziecięce."
+      "a": "👨‍👩‍👧‍👦 Tak, dzieci są mile widziane! Dla najmłodszych mamy aquapark Tropikana, kącik zabaw i menu dziecięce."
     },
     {
       "q": "Czy hotel przyjmuje zwierzęta?",
@@ -35,7 +39,7 @@ const hotelData = {
     },
     {
       "q": "Jak dojechać do hotelu?",
-      "a": "🚗 Hotel znajduje się 2 km od centrum Zakopanego. Można do nas dojechać taksówką, autobusem lub zamówić transfer z dworca."
+      "a": "🚗 Hotel znajduje się przy ul. Mrągowskiej 34 w Mikołajkach, nad jeziorem Mikołajskim. Dojazd samochodem, autobusem lub transferem z dworca w Mrągowie."
     },
     {
       "q": "Czy jest dostępne Wi-Fi?",
@@ -47,7 +51,7 @@ const hotelData = {
     },
     {
       "q": "Jakie atrakcje są w pobliżu?",
-      "a": "🎿 W pobliżu znajdują się Krupówki (15 min pieszo), kolejka na Gubałówkę i Termy Chochołowskie (30 min jazdy)."
+      "a": "⛵ Rejsy po jeziorach mazurskich, centrum Mikołajek (10 min pieszo), szlaki rowerowe i kajakowe, aquapark Tropikana w hotelu."
     },
     {
       "q": "Czy jest parking?",

@@ -13,37 +13,37 @@ const hotelData = {
     {
       type: "Standard",
       price: "350 PLN/noc",
-      description: "Przytulny pokój z widokiem na góry, łóżko double/twin, łazienka z prysznicem, Wi-Fi, TV",
-      amenities: ["Wi-Fi", "TV", "Sejf", "Czajnik", "Widok na góry"],
+      description: "Przytulny pokój z widokiem na jezioro, łóżko double/twin, łazienka z prysznicem, Wi-Fi, TV",
+      amenities: ["Wi-Fi", "TV", "Sejf", "Czajnik", "Widok na jezioro"],
     },
     {
       type: "Superior",
       price: "500 PLN/noc",
-      description: "Przestronny pokój z balkonem, king-size bed, łazienka z wanną, халат i kapcie, minibar",
-      amenities: ["Wi-Fi", "TV", "Sejf", "Minibar", "Balkon", "Wanna", "Халаты"],
+      description: "Przestronny pokój z balkonem, king-size bed, łazienka z wanną, szlafrok i kapcie, minibar",
+      amenities: ["Wi-Fi", "TV", "Sejf", "Minibar", "Balkon", "Wanna", "Szlafrok"],
     },
     {
       type: "Suite",
       price: "800 PLN/noc",
-      description: "Luksusowy apartament z salonem, sypialnią, jacuzzi, widok panoramiczny na Tatry",
-      amenities: ["Wi-Fi", "TV", "Minibar", "Jacuzzi", "Salon", "Widok panoramiczny", "Халаты premium"],
+      description: "Luksusowy apartament z salonem, sypialnią, jacuzzi, widok panoramiczny na Mazury",
+      amenities: ["Wi-Fi", "TV", "Minibar", "Jacuzzi", "Salon", "Widok panoramiczny", "Szlafrok premium"],
     },
   ],
 
   restaurant: {
-    name: "Restauracja Tatrzańska",
+    name: "Restauracja Gołębiewski",
     hours: "7:00-22:00",
     breakfast: {
       time: "7:00-10:30",
       price: "60 PLN/osoba",
       description:
-        "Bogaty bufet śniadaniowy: jajecznica, naleśniki, wędliny regionalne, sery oscypek, owoce, świeże pieczywo, kawa, herbata, soki",
+        "Bogaty bufet śniadaniowy: jajecznica, naleśniki, wędliny regionalne, sery, owoce, świeże pieczywo, kawa, herbata, soki",
     },
     lunch: {
       time: "12:00-16:00",
       menu: [
-        "Żurek tatrzański w chlebie - 28 PLN",
-        "Placki ziemniaczane z gulaszem - 35 PLN",
+        "Zupa rybna mazurska - 28 PLN",
+        "Kartacze z mięsem - 35 PLN",
         "Pstrąg z grilla z warzywami - 45 PLN",
         "Sałatka Caesar z kurczakiem - 32 PLN",
       ],
@@ -52,10 +52,10 @@ const hotelData = {
       time: "18:00-22:00",
       specials: [
         "Stek wołowy z frytkami i sosem pieprzowym - 78 PLN",
-        "Karkówka po góralsku z oscypkiem - 55 PLN",
+        "Sielawa smażona z ziemniakami - 55 PLN",
         "Łosoś pieczony z ryżem i szparagami - 68 PLN",
         "Pierogi ruskie/mięsne/z serem i truskawkami - 28 PLN",
-        "Sernik zakopański - 18 PLN",
+        "Placek po mazursku - 18 PLN",
       ],
     },
     drinks: "Wina regionalne, piwo Żywiec, kawa Lavazza, herbaty premium",
@@ -120,19 +120,23 @@ const hotelData = {
   faq: [
     {
       q: "Gdzie znajduje się hotel?",
-      a: "📍 Adres: ul. Górska 15, 34-500 Zakopane, Polska. Link do mapy: https://maps.app.goo.gl/exampleHotel",
+      a: "📍 Adres: ul. Mrągowska 34, 11-730 Mikołajki, Polska (Pojezierze Mazurskie).",
     },
     {
       q: "Jakie są godziny zameldowania i wymeldowania?",
-      a: "🕒 Zameldowanie od 14:00, wymeldowanie do 11:00.",
+      a: "🕒 Zameldowanie od 15:00, wymeldowanie do 11:00.",
     },
     {
       q: "Czy w hotelu jest spa?",
       a: "💆‍♀️ Tak, strefa SPA jest czynna codziennie od 10:00 do 21:00. Goście hotelowi mają 10% zniżki na masaże.",
     },
     {
+      q: "Czy jest akvpark?",
+      a: "🏊 Tak! Hotel posiada aquapark Tropikana z basenami, zjeżdżalniami i strefą dla dzieci.",
+    },
+    {
       q: "Czy można przyjechać z dziećmi?",
-      a: "👨‍👩‍👧‍👦 Tak, dzieci są mile widziane! Dla najmłodszych przygotowaliśmy kącik zabaw i menu dziecięce.",
+      a: "👨‍👩‍👧‍👦 Tak, dzieci są mile widziane! Dla najmłodszych mamy aquapark Tropikana, kącik zabaw i menu dziecięce.",
     },
     {
       q: "Czy hotel przyjmuje zwierzęta?",
@@ -144,7 +148,7 @@ const hotelData = {
     },
     {
       q: "Jak dojechać do hotelu?",
-      a: "🚗 Hotel znajduje się 2 km od centrum Zakopanego. Można do nas dojechać taksówką, autobusem lub zamówić transfer z dworca.",
+      a: "🚗 Hotel znajduje się przy ul. Mrągowskiej 34 w Mikołajkach, nad jeziorem Mikołajskim. Dojazd samochodem, autobusem lub transferem z dworca w Mrągowie.",
     },
     {
       q: "Czy jest dostępne Wi-Fi?",
@@ -156,7 +160,7 @@ const hotelData = {
     },
     {
       q: "Jakie atrakcje są w pobliżu?",
-      a: "🎿 W pobliżu znajdują się Krupówki (15 min pieszo), kolejka na Gubałówkę i Termy Chochołowskie (30 min jazdy).",
+      a: "⛵ Rejsy po jeziorach mazurskich, centrum Mikołajek (10 min pieszo), szlaki rowerowe i kajakowe, aquapark Tropikana w hotelu.",
     },
     {
       q: "Czy jest parking?",

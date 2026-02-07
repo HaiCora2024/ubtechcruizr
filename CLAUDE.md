@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Hotel Concierge AI Chatbot with voice interaction for "Hotel Panorama & Spa" (Zakopane, Poland). Built with **Lovable.dev** as a voice-first, multilingual (Polish/English) hotel assistant that integrates with a physical robot via `window.RobotBridge`.
+Hotel Concierge AI Chatbot with voice interaction for "Hotel Gołębiewski w Mikołajkach" (Mikołajki, Poland). Built with **Lovable.dev** as a voice-first, multilingual (Polish/English) hotel assistant that integrates with a physical robot via `window.RobotBridge`.
 
 ## Build & Development Commands
 
