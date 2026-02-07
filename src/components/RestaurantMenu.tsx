@@ -105,7 +105,7 @@ export const RestaurantMenu = ({ onBack }: RestaurantMenuProps) => {
           Powrót
         </Button>
         <h1 className="text-3xl font-bold text-primary">
-          Restauracja Panorama
+          Restauracja Gołębiewski
         </h1>
         <div className="flex items-center gap-2 text-muted-foreground">
           <Clock className="w-5 h-5" />

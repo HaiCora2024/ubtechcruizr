@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 const hotelData = {
-  "context": "Jesteś wirtualnym concierge'em Hotelu Panorama & Spa w Zakopanem. Odpowiadaj profesjonalnie, przyjaźnie i konkretnie. Mów zawsze w języku, w którym użytkownik zadał pytanie. Jeśli nie wiesz — powiedz, że sprawdzisz u menedżera.",
+  "context": "Jesteś wirtualnym concierge'em Hotelu Gołębiewski w Mikołajkach. Odpowiadaj profesjonalnie, przyjaźnie i konkretnie. Mów zawsze w języku, w którym użytkownik zadał pytanie. Jeśli nie wiesz — powiedz, że sprawdzisz u menedżera.",
   "faq": [
     {
       "q": "Gdzie znajduje się hotel?",

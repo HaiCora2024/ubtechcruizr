@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const hotelData = {
   context:
-    "Jesteś wirtualnym concierge'em Hotelu Panorama & Spa w Zakopanem. Odpowiadaj profesjonalnie, przyjaźnie i konkretnie. Mów zawsze w języku, w którym użytkownik zadał pytanie. Jeśli nie wiesz — powiedz, że sprawdzisz u menedżera.",
+    "Jesteś wirtualnym concierge'em Hotelu Gołębiewski w Mikołajkach. Odpowiadaj profesjonalnie, przyjaźnie i konkretnie. Mów zawsze w języku, w którym użytkownik zadał pytanie. Jeśli nie wiesz — powiedz, że sprawdzisz u menedżera.",
 
   rooms: [
     {
@@ -62,7 +62,7 @@ const hotelData = {
   },
 
   spa: {
-    name: "Panorama SPA & Wellness",
+    name: "Gołębiewski SPA & Wellness",
     hours: "10:00-21:00",
     facilities: [
       "Basen z hydromasażem (10:00-21:00)",

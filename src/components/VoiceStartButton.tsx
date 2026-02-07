@@ -169,7 +169,7 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
     >
       {/* Header - Logo centered at top */}
       <div className="flex flex-col items-center gap-2 pt-6 pb-4">
-        <h1 className="text-4xl font-bold text-white text-center">Hotel Panorama & Spa</h1>
+        <h1 className="text-4xl font-bold text-white text-center">Hotel Gołębiewski Mikołajki</h1>
         <p className="text-lg text-white/90 text-center">Wirtualny Asystent Recepcji</p>
       </div>
 
