@@ -3,7 +3,7 @@ import { ArrowLeft, Clock, Mic, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeFunction } from "@/integrations/backend/invoke";
 import { useState } from "react";
 import foodBreakfast from "@/assets/food-breakfast.jpg";
 import foodSoup from "@/assets/food-soup.jpg";
@@ -66,9 +66,7 @@ export const RestaurantMenu = ({ onBack }: RestaurantMenuProps) => {
         const transcribedText = await stopRecording();
         setCurrentTranscript(transcribedText);
         
-        const { data, error } = await supabase.functions.invoke('hotel-chat', {
-          body: { message: transcribedText }
-        });
+        const { data, error } = await invokeFunction<any>('hotel-chat', { message: transcribedText });
 
         if (error) throw error;
 

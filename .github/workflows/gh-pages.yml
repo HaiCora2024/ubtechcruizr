@@ -1,0 +1,97 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  WORKDIR: "." # set if monorepo, e.g. "apps/web"
+  # Optional overrides (Repository Settings -> Secrets and variables -> Actions -> Variables)
+  VITE_BASE: ${{ vars.VITE_BASE }}
+  VITE_BACKEND_URL: ${{ vars.VITE_BACKEND_URL }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable corepack (pnpm/yarn)
+        run: corepack enable
+
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          cd "${{ env.WORKDIR }}"
+          if [ -f pnpm-lock.yaml ]; then
+            pnpm install --frozen-lockfile
+          elif [ -f yarn.lock ]; then
+            yarn install --frozen-lockfile
+          elif [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Build
+        run: |
+          set -euo pipefail
+          cd "${{ env.WORKDIR }}"
+          if [ -f pnpm-lock.yaml ]; then
+            pnpm run build
+          elif [ -f yarn.lock ]; then
+            yarn build
+          else
+            npm run build
+          fi
+
+      - name: Detect build output directory
+        run: |
+          set -euo pipefail
+          cd "${{ env.WORKDIR }}"
+          if [ -d dist ]; then
+            echo "PAGES_ARTIFACT_DIR=${{ env.WORKDIR }}/dist" >> "$GITHUB_ENV"
+          elif [ -d build ]; then
+            echo "PAGES_ARTIFACT_DIR=${{ env.WORKDIR }}/build" >> "$GITHUB_ENV"
+          elif [ -d out ]; then
+            echo "PAGES_ARTIFACT_DIR=${{ env.WORKDIR }}/out" >> "$GITHUB_ENV"
+          else
+            echo "No build output folder found (dist/build/out) under ${{ env.WORKDIR }}." >&2
+            exit 1
+          fi
+
+      - name: Disable Jekyll
+        run: touch "${{ env.PAGES_ARTIFACT_DIR }}/.nojekyll"
+
+      - name: SPA 404 fallback (optional)
+        run: |
+          if [ -f "${{ env.PAGES_ARTIFACT_DIR }}/index.html" ] && [ ! -f "${{ env.PAGES_ARTIFACT_DIR }}/404.html" ]; then
+            cp "${{ env.PAGES_ARTIFACT_DIR }}/index.html" "${{ env.PAGES_ARTIFACT_DIR }}/404.html"
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.PAGES_ARTIFACT_DIR }}
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

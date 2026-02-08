@@ -3,7 +3,7 @@ import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { VoiceStartButton } from "./VoiceStartButton";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeFunction } from "@/integrations/backend/invoke";
 import hotelData from "@/data/hotel-data.json";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
@@ -35,25 +35,20 @@ export const HotelChat = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('hotel-chat', {
-        body: { 
-          message,
-          hotelData 
-        }
-      });
+      const { data, error } = await invokeFunction<any>('hotel-chat', { message, hotelData });
 
       if (error) throw error;
 
       const assistantMessage: Message = {
         role: "assistant",
-        content: data.response
+        content: data.message || data.text || "Przepraszam, nie zrozumiałem.",
       };
       
       setMessages(prev => [...prev, assistantMessage]);
 
       // Auto-speak response if enabled
       if (autoSpeak) {
-        await speak(data.response);
+        await speak(assistantMessage.content);
       }
     } catch (error: any) {
       console.error('Chat error:', error);

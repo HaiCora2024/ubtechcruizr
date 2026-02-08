@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { invokeFunction } from "@/integrations/backend/invoke";
 
 export class AudioRecorder {
   private stream: MediaStream | null = null;
@@ -80,7 +80,7 @@ export class RealtimeChat {
       console.log('Initializing Realtime chat...');
       
       // Get ephemeral token
-      const { data, error } = await supabase.functions.invoke("realtime-token");
+      const { data, error } = await invokeFunction<any>("realtime-token");
       
       if (error || !data) {
         throw new Error("Failed to get ephemeral token: " + (error?.message || 'No data'));

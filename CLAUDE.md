@@ -23,10 +23,10 @@ No test framework is configured.
 **Frontend:** React 18 + TypeScript + Vite, with shadcn/ui (Radix) components and TailwindCSS.
 
 **Backend:** Supabase Edge Functions (Deno runtime) handle all AI/voice processing:
-- `supabase/functions/hotel-chat/` — Main AI chat logic via Lovable API (sends conversation history + hotel context)
+- `supabase/functions/hotel-chat/` — Main AI chat logic via OpenAI Chat Completions (sends conversation history + hotel context)
 - `supabase/functions/speech-to-text/` — OpenAI Whisper wrapper
 - `supabase/functions/text-to-speech/` — OpenAI TTS wrapper
-- `supabase/functions/generate-image/` — DALL-E integration
+- `supabase/functions/generate-image/` — OpenAI Images API integration (prefers GPT Image models; falls back to DALL-E 3 if needed)
 - `supabase/functions/realtime-token/` — Token management
 
 **Data flow:** User speaks → `useAudioRecorder` captures audio → base64 → Supabase `speech-to-text` → transcript → `hotel-chat` with conversation history → response → `useTextToSpeech` plays audio + triggers RobotBridge gestures/lights.
@@ -64,5 +64,6 @@ Frontend (in `.env`, prefixed with `VITE_`):
 - `VITE_SUPABASE_PUBLISHABLE_KEY` — Supabase anon key
 
 Supabase function secrets (configured in Supabase dashboard):
-- `OPENAI_API_KEY` — For TTS/STT
-- `LOVABLE_API_KEY` — For hotel-chat AI
+- `OPENAI_API_KEY` — For chat + TTS/STT + images + realtime token
+- `OPENAI_CHAT_MODEL` — Optional (default: `gpt-4.1-mini`)
+- `OPENAI_IMAGE_MODEL` — Optional (default: `gpt-image-1`)

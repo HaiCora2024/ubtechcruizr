@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { invokeFunction } from "@/integrations/backend/invoke";
 
 // Extend Window interface for RobotBridge
 declare global {
@@ -41,11 +41,10 @@ export const useTextToSpeech = () => {
         }, 0);
       }
 
-      const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text, voice },
-      });
+      const { data, error } = await invokeFunction<{ audioContent: string }>("text-to-speech", { text, voice });
 
       if (error) throw error;
+      if (!data?.audioContent) throw new Error("No audioContent in response");
 
       // Decode base64 and play
       const audioData = atob(data.audioContent);

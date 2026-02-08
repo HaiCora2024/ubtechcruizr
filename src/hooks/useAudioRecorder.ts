@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeFunction } from "@/integrations/backend/invoke";
 
 export const useAudioRecorder = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -115,9 +115,7 @@ export const useAudioRecorder = () => {
             console.log('Sending audio to transcription service, size:', base64Audio.length);
 
             // Send to Whisper API
-            const { data, error } = await supabase.functions.invoke('speech-to-text', {
-              body: { audio: base64Audio }
-            });
+            const { data, error } = await invokeFunction<{ text: string }>('speech-to-text', { audio: base64Audio });
 
             setIsProcessing(false);
 

@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
 const hotelData = {
@@ -169,7 +170,7 @@ const hotelData = {
   ],
 };
 
-serve(async (req) => {
+export async function handler(req: Request): Promise<Response> {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -184,10 +185,11 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not configured");
     }
+    const model = Deno.env.get("OPENAI_CHAT_MODEL") || "gpt-4.1-mini";
 
     // Build FAQ context
     const faqText = hotelData.faq.map((item: any) => `Q: ${item.q}\nA: ${item.a}`).join("\n\n");
@@ -263,23 +265,79 @@ ZACHOWANIE: Profesjonalny concierge. Używaj konkretnych danych (ceny, nazwy). S
     console.log("Sending request to AI with message:", message);
     console.log("Conversation history length:", history.length);
 
-    // Call Lovable AI
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const allowedRoles = new Set(["system", "user", "assistant", "developer"]);
+    const safeHistory = Array.isArray(history)
+      ? history
+          .filter((m: any) => m && typeof m === "object")
+          .filter((m: any) => typeof m.role === "string" && allowedRoles.has(m.role))
+          .filter((m: any) => typeof m.content === "string" && m.content.length > 0)
+          .map((m: any) => ({ role: m.role, content: m.content }))
+      : [];
+
+    // Call OpenAI Chat Completions
+    const requestBody = {
+      model,
+      messages: [{ role: "system", content: systemPrompt }, ...safeHistory, { role: "user", content: message }],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "hotel_chat_response",
+          strict: true,
+          schema: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              text: { type: "string" },
+              gesture: { type: "string" },
+              emotion: { type: "string" },
+            },
+            required: ["text"],
+          },
+        },
+      },
+      temperature: 0.3,
+    };
+
+    let response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [{ role: "system", content: systemPrompt }, ...history, { role: "user", content: message }],
-        temperature: 0.3,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
+    let errorText: string | null = null;
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI API error:", response.status, errorText);
+      errorText = await response.text();
+      console.error("OpenAI API error:", response.status, errorText);
+
+      // Some models may not support JSON Schema structured outputs. Retry once with plain JSON mode.
+      if (response.status === 400 && /response_format|json_schema/i.test(errorText)) {
+        console.warn("[hotel-chat] retrying without json_schema response_format");
+        response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...requestBody,
+            response_format: { type: "json_object" },
+          }),
+        });
+
+        if (!response.ok) {
+          errorText = await response.text();
+          console.error("OpenAI API error:", response.status, errorText);
+        } else {
+          errorText = null;
+        }
+      }
+    }
+
+    if (!response.ok) {
+      const err = errorText ?? (await response.text());
 
       if (response.status === 429) {
         return new Response(
@@ -303,7 +361,8 @@ ZACHOWANIE: Profesjonalny concierge. Używaj konkretnych danych (ceny, nazwy). S
         );
       }
 
-      throw new Error(`AI API error: ${response.status}`);
+      console.error("OpenAI API error:", response.status, err);
+      throw new Error(`OpenAI API error: ${response.status}`);
     }
 
     const data = await response.json();
@@ -357,4 +416,8 @@ ZACHOWANIE: Profesjonalny concierge. Używaj konkretnych danych (ceny, nazwy). S
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
-});
+}
+
+if (import.meta.main) {
+  serve(handler);
+}

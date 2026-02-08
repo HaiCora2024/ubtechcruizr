@@ -3,7 +3,7 @@ import { ArrowLeft, Clock, Droplet, Sparkles, Mic, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeFunction } from "@/integrations/backend/invoke";
 import { useState } from "react";
 import spaMassage from "@/assets/spa-massage.jpg";
 import spaFacial from "@/assets/spa-facial.jpg";
@@ -140,9 +140,7 @@ export const SpaMenu = ({ onBack }: SpaMenuProps) => {
         const transcribedText = await stopRecording();
         setCurrentTranscript(transcribedText);
         
-        const { data, error } = await supabase.functions.invoke('hotel-chat', {
-          body: { message: transcribedText }
-        });
+        const { data, error } = await invokeFunction<any>('hotel-chat', { message: transcribedText });
 
         if (error) throw error;
 

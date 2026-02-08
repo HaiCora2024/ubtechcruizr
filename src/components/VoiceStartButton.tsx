@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeFunction } from "@/integrations/backend/invoke";
 import alpineBackground from "@/assets/alpine-background.jpg";
 import { RestaurantMenu } from "./RestaurantMenu";
 import { SpaMenu } from "./SpaMenu";
@@ -87,11 +87,9 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
         setCurrentTranscript(transcribedText);
 
         // ⭐ ИЗМЕНЕНО: Передаём историю разговора
-        const { data, error } = await supabase.functions.invoke("hotel-chat", {
-          body: {
-            message: transcribedText,
-            history: conversationHistory, // ← Передаём весь контекст!
-          },
+        const { data, error } = await invokeFunction<any>("hotel-chat", {
+          message: transcribedText,
+          history: conversationHistory, // ← Передаём весь контекст!
         });
 
         if (error) throw error;

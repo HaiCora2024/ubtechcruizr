@@ -6,6 +6,19 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // GitHub Pages serves project sites under "/<repo>/". Auto-detect in Actions to avoid manual base edits.
+  base: (() => {
+    const fromEnv = process.env.VITE_BASE?.trim();
+    if (fromEnv) return fromEnv;
+
+    const repo = process.env.GITHUB_REPOSITORY?.split("/")?.[1]?.trim();
+    if (!repo) return "/";
+
+    // Special case for user/organization Pages (repo "<owner>.github.io") which is served at "/".
+    if (repo.endsWith(".github.io")) return "/";
+
+    return `/${repo}/`;
+  })(),
   server: {
     host: "::",
     port: 8080,
