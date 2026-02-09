@@ -64,6 +64,10 @@ This project is built with:
 
 Simply open [Lovable](https://lovable.dev/projects/fd7479e8-b74d-4114-9cf5-16bbb706c415) and click on Share -> Publish.
 
+## GitHub Pages
+
+See `docs/GITHUB_PAGES_DEPLOY.md`.
+
 ## Can I connect a custom domain to my Lovable project?
 
 Yes, you can!
