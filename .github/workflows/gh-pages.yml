@@ -17,6 +17,9 @@ concurrency:
 env:
   NODE_VERSION: "20"
   WORKDIR: "." # set if monorepo, e.g. "apps/web"
+  # Avoid "Multiple artifacts named github-pages" when re-running jobs in the same workflow run.
+  # GitHub keeps artifacts from previous run attempts, so we make the artifact name attempt-scoped.
+  PAGES_ARTIFACT_NAME: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
   # Optional overrides (Repository Settings -> Secrets and variables -> Actions -> Variables)
   VITE_BASE: ${{ vars.VITE_BASE }}
   VITE_BACKEND_URL: ${{ vars.VITE_BACKEND_URL }}
@@ -99,6 +102,9 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ env.PAGES_ARTIFACT_DIR }}
+          name: ${{ env.PAGES_ARTIFACT_NAME }}
 
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: ${{ env.PAGES_ARTIFACT_NAME }}
