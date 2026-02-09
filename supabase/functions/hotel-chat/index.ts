@@ -309,7 +309,7 @@ ZACHOWANIE: Profesjonalny concierge. Używaj konkretnych danych (ceny, nazwy). S
       : [];
 
     // Call OpenAI Chat Completions
-    const requestBody = {
+    const baseRequestBody = {
       model,
       messages: [{ role: "system", content: systemPromptFinal }, ...safeHistory, { role: "user", content: message }],
       response_format: {
@@ -332,23 +332,47 @@ ZACHOWANIE: Profesjonalny concierge. Używaj konkretnych danych (ceny, nazwy). S
       temperature: 0.3,
     };
 
-    let response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    });
+    const doRequest = async (body: unknown) =>
+      await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+    let requestBody: any = baseRequestBody;
+    let response = await doRequest(requestBody);
 
     let errorText: string | null = null;
-    if (!response.ok) {
+    let retriedWithoutJsonSchema = false;
+    let retriedWithoutTemperature = false;
+
+    // Some models reject specific params (e.g. temperature or json_schema). Retry once per mitigation.
+    for (let i = 0; i < 2 && !response.ok; i++) {
       errorText = await response.text();
       console.error("OpenAI API error:", response.status, errorText);
 
-      // Some models may not support JSON Schema structured outputs. Retry once with plain JSON mode.
-      if (response.status === 400 && /response_format|json_schema/i.test(errorText)) {
+      // Some models (notably reasoning/realtime variants) only support default temperature=1.
+      if (
+        response.status === 400 &&
+        !retriedWithoutTemperature &&
+        /unsupported_value/i.test(errorText) &&
+        /"param"\s*:\s*"temperature"|temperature.*Only the default/i.test(errorText)
+      ) {
+        console.warn("[hotel-chat] retrying without temperature");
+        retriedWithoutTemperature = true;
+        const { temperature: _t, ...rest } = requestBody;
+        requestBody = rest;
+        response = await doRequest(requestBody);
+        continue;
+      }
+
+      // Some models may not support JSON Schema structured outputs. Retry with plain JSON mode.
+      if (response.status === 400 && !retriedWithoutJsonSchema && /response_format|json_schema/i.test(errorText)) {
         console.warn("[hotel-chat] retrying without json_schema response_format");
+        retriedWithoutJsonSchema = true;
         response = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -360,14 +384,10 @@ ZACHOWANIE: Profesjonalny concierge. Używaj konkretnych danych (ceny, nazwy). S
             response_format: { type: "json_object" },
           }),
         });
-
-        if (!response.ok) {
-          errorText = await response.text();
-          console.error("OpenAI API error:", response.status, errorText);
-        } else {
-          errorText = null;
-        }
+        if (response.ok) errorText = null;
+        continue;
       }
+      break;
     }
 
     if (!response.ok) {

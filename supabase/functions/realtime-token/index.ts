@@ -113,30 +113,55 @@ export async function handler(req: Request): Promise<Response> {
     console.log('Creating ephemeral token for Realtime API');
 
     // Request ephemeral token from OpenAI
-    const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
+    const requestBody: any = {
+      model: "gpt-4o-realtime-preview-2024-12-17",
+      voice: "alloy",
+      instructions: instructions,
+      input_audio_format: "pcm16",
+      output_audio_format: "pcm16",
+      input_audio_transcription: {
+        model: "whisper-1",
+      },
+      turn_detection: {
+        type: "server_vad",
+        threshold: 0.5,
+        prefix_padding_ms: 300,
+        silence_duration_ms: 1000,
+      },
+      temperature: 0.8,
+    };
+
+    let response = await fetch("https://api.openai.com/v1/realtime/sessions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "gpt-4o-realtime-preview-2024-12-17",
-        voice: "alloy",
-        instructions: instructions,
-        input_audio_format: "pcm16",
-        output_audio_format: "pcm16",
-        input_audio_transcription: {
-          model: "whisper-1"
-        },
-        turn_detection: {
-          type: "server_vad",
-          threshold: 0.5,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 1000
-        },
-        temperature: 0.8
-      }),
+      body: JSON.stringify(requestBody),
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI API error:', response.status, errorText);
+
+      // Some models only support default temperature=1. Retry without temperature in that case.
+      if (
+        response.status === 400 &&
+        /unsupported_value/i.test(errorText) &&
+        /"param"\s*:\s*"temperature"|temperature.*Only the default/i.test(errorText)
+      ) {
+        console.warn("[realtime-token] retrying without temperature");
+        const { temperature: _t, ...rest } = requestBody;
+        response = await fetch("https://api.openai.com/v1/realtime/sessions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${OPENAI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(rest),
+        });
+      }
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
