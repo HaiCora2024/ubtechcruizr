@@ -20,6 +20,10 @@ env:
   # Optional overrides (Repository Settings -> Secrets and variables -> Actions -> Variables)
   VITE_BASE: ${{ vars.VITE_BASE }}
   VITE_BACKEND_URL: ${{ vars.VITE_BACKEND_URL }}
+  # Frontend runtime config (exposed to the built JS bundle by Vite).
+  # Define these in: Settings -> Secrets and variables -> Actions -> Variables
+  VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+  VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
 
 jobs:
   deploy:
@@ -88,6 +92,9 @@ jobs:
           fi
 
       - uses: actions/configure-pages@v5
+        with:
+          # Auto-enable Pages if it wasn't enabled yet (requires repo admin perms).
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
