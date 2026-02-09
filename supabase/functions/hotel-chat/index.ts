@@ -325,7 +325,7 @@ ZACHOWANIE: Profesjonalny concierge. Używaj konkretnych danych (ceny, nazwy). S
               gesture: { type: "string" },
               emotion: { type: "string" },
             },
-            required: ["text"],
+            required: ["text", "gesture", "emotion"],
           },
         },
       },
