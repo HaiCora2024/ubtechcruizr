@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, Loader2, UtensilsCrossed, Droplet } from "lucide-react";
+import { Mic, Loader2, UtensilsCrossed, Droplet, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { invokeFunction } from "@/integrations/backend/invoke";
-import alpineBackground from "@/assets/alpine-background.jpg";
+import hotelBackground from "@/assets/hotel-background.webp";
 import { RestaurantMenu } from "./RestaurantMenu";
 import { SpaMenu } from "./SpaMenu";
 
@@ -159,7 +159,7 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
     <div
       className="flex flex-col h-full relative"
       style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${alpineBackground})`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${hotelBackground})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -233,6 +233,13 @@ export const VoiceStartButton = ({ isLoading }: VoiceStartButtonProps) => {
                 </>
               )}
             </Button>
+
+            {/* Green checkmark badge — hints user to tap again to finish */}
+            {isRecording && (
+              <div className="absolute -bottom-1 -right-1 z-20 bg-green-500 rounded-full w-12 h-12 flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
+                <Check className="w-7 h-7 text-white" strokeWidth={3} />
+              </div>
+            )}
           </div>
 
           <p className={cn("text-xl font-semibold transition-colors text-white", getStatusColor())}>

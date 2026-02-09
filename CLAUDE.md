@@ -67,3 +67,4 @@ Supabase function secrets (configured in Supabase dashboard):
 - `OPENAI_API_KEY` — For chat + TTS/STT + images + realtime token
 - `OPENAI_CHAT_MODEL` — Optional (default: `gpt-4.1-mini`)
 - `OPENAI_IMAGE_MODEL` — Optional (default: `gpt-image-1`)
+- `WEATHER_API_KEY` — OpenWeatherMap API key for real-time weather in Mikołajki

@@ -7,6 +7,34 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
 
+// Fetch current weather for Mikołajki
+async function fetchWeather(): Promise<string> {
+  const apiKey = Deno.env.get("WEATHER_API_KEY");
+  if (!apiKey) {
+    console.warn("WEATHER_API_KEY not set, skipping weather data");
+    return "";
+  }
+  try {
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=53.8&lon=21.57&units=metric&lang=pl&appid=${apiKey}`
+    );
+    if (!res.ok) {
+      console.error("Weather API error:", res.status);
+      return "";
+    }
+    const w = await res.json();
+    const temp = Math.round(w.main.temp);
+    const feels = Math.round(w.main.feels_like);
+    const desc = w.weather?.[0]?.description || "";
+    const wind = Math.round(w.wind?.speed || 0);
+    const humidity = w.main?.humidity || 0;
+    return `CURRENT WEATHER IN MIKOŁAJKI: ${temp}°C (feels like ${feels}°C), ${desc}, wind ${wind} m/s, humidity ${humidity}%. Use this data when the guest asks about weather.`;
+  } catch (e) {
+    console.error("Weather fetch failed:", e);
+    return "";
+  }
+}
+
 const hotelData = {
   "context": "Jesteś wirtualnym concierge'em Hotelu Gołębiewski w Mikołajkach. Odpowiadaj profesjonalnie, przyjaźnie i konkretnie. Mów zawsze w języku, w którym użytkownik zadał pytanie. Jeśli nie wiesz — powiedz, że sprawdzisz u menedżera.",
   "faq": [
@@ -76,8 +104,11 @@ export async function handler(req: Request): Promise<Response> {
     const faqText = hotelData.faq
       .map((item: any) => `Q: ${item.q}\nA: ${item.a}`)
       .join('\n\n');
-    
-    const instructions = `${hotelData.context}\n\nFAQ:\n${faqText}\n\nIMPORTANT: Always respond in the same language as the user speaks. Detect the language and answer in that exact language. Be EXTREMELY concise and brief - answer in 1-2 short sentences maximum. Get straight to the point without unnecessary words or explanations.`;
+
+    // Fetch real-time weather
+    const weatherInfo = await fetchWeather();
+
+    const instructions = `${hotelData.context}\n\nFAQ:\n${faqText}${weatherInfo ? `\n\n${weatherInfo}` : ""}\n\nCRITICAL LANGUAGE RULE: You MUST detect the language the user speaks and ALWAYS reply in that SAME language. If the guest speaks English — answer in English. Russian — answer in Russian. German — in German. Never default to Polish if the guest speaks another language. Supported: pl, en, ru, de, cs, uk, fr. Be EXTREMELY concise and brief - answer in 1-2 short sentences maximum. Get straight to the point without unnecessary words or explanations.`;
 
     console.log('Creating ephemeral token for Realtime API');
 

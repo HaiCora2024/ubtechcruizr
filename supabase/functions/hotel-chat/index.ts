@@ -6,6 +6,34 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
+// Fetch current weather for Mikołajki (cached for the request)
+async function fetchWeather(): Promise<string> {
+  const apiKey = Deno.env.get("WEATHER_API_KEY");
+  if (!apiKey) {
+    console.warn("WEATHER_API_KEY not set, skipping weather data");
+    return "";
+  }
+  try {
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=53.8&lon=21.57&units=metric&lang=pl&appid=${apiKey}`
+    );
+    if (!res.ok) {
+      console.error("Weather API error:", res.status);
+      return "";
+    }
+    const w = await res.json();
+    const temp = Math.round(w.main.temp);
+    const feels = Math.round(w.main.feels_like);
+    const desc = w.weather?.[0]?.description || "";
+    const wind = Math.round(w.wind?.speed || 0);
+    const humidity = w.main?.humidity || 0;
+    return `AKTUALNA POGODA W MIKOŁAJKACH: ${temp}°C (odczuwalna ${feels}°C), ${desc}, wiatr ${wind} m/s, wilgotność ${humidity}%. Użyj tych danych, gdy gość pyta o pogodę.`;
+  } catch (e) {
+    console.error("Weather fetch failed:", e);
+    return "";
+  }
+}
+
 const hotelData = {
   context:
     "Jesteś wirtualnym concierge'em Hotelu Gołębiewski w Mikołajkach. Odpowiadaj profesjonalnie, przyjaźnie i konkretnie. Mów zawsze w języku, w którym użytkownik zadał pytanie. Jeśli nie wiesz — powiedz, że sprawdzisz u menedżera.",
@@ -253,7 +281,7 @@ Pakiety: ${hotelData.spa.packages.map((p: any) => `${p.name} ${p.price}`).join("
 
 FAQ: ${faqText}
 
-JĘZYK: Odpowiadaj W JĘZYKU użytkownika (pl/en/ru/de/cs).
+JĘZYK: ZAWSZE odpowiadaj W TYM SAMYM JĘZYKU, w którym mówi użytkownik. Jeśli mówi po angielsku — odpowiadaj po angielsku. Po rosyjsku — po rosyjsku. Po niemiecku — po niemiecku. Automatycznie dopasuj się do języka gościa. Obsługiwane języki: pl, en, ru, de, cs, uk, fr.
 
 FORMAT JSON (bez markdown):
 {"text": "odpowiedź", "gesture": "nazwa", "emotion": "emocja"}
@@ -261,6 +289,12 @@ FORMAT JSON (bez markdown):
 GESTY: swingarm (przywitanie), goodbye, nod (zgoda), celebrate (radość), hug (spa), shankhand (umowa), guideright/guideleft (kierunki), searching (sprawdzanie), surprise, shy, fadai (myślenie), applause, talk1-8
 
 ZACHOWANIE: Profesjonalny concierge. Używaj konkretnych danych (ceny, nazwy). Symuluj rezerwacje (RES-2025-XXXX). Sugeruj dodatkowe usługi.`;
+
+    // Fetch real-time weather
+    const weatherInfo = await fetchWeather();
+    const systemPromptFinal = weatherInfo
+      ? `${systemPrompt}\n\n${weatherInfo}`
+      : systemPrompt;
 
     console.log("Sending request to AI with message:", message);
     console.log("Conversation history length:", history.length);
@@ -277,7 +311,7 @@ ZACHOWANIE: Profesjonalny concierge. Używaj konkretnych danych (ceny, nazwy). S
     // Call OpenAI Chat Completions
     const requestBody = {
       model,
-      messages: [{ role: "system", content: systemPrompt }, ...safeHistory, { role: "user", content: message }],
+      messages: [{ role: "system", content: systemPromptFinal }, ...safeHistory, { role: "user", content: message }],
       response_format: {
         type: "json_schema",
         json_schema: {
